@@ -14,5 +14,10 @@ assert.deepStrictEqual({ a: 1 }, { a: 1 });
  * should 语法
  */
 var should = require('should');
- 
 (5).should.be.exactly(5).and.be.a.Number();
+
+
+/**
+ * 1.0.2
+ * should 语法
+ */
