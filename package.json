@@ -1,0 +1,22 @@
+{
+  "scripts": {
+    "test": "mocha"
+  },
+  "name": "amateur-study",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LiuYashion/amateur-study.git"
+  },
+  "author": "lyx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LiuYashion/amateur-study/issues"
+  },
+  "homepage": "https://github.com/LiuYashion/amateur-study#readme",
+  "description": ""
+}
