@@ -1,10 +1,9 @@
 
-# Node assert的用法
+# node assert的用法
 > ./index.js
+assert是node中自带的一个模块，它提供了断言测试的函数，用于测试不变库。[node-assert章节](http://nodejs.cn/api/assert.html)
 
-assert是node中自带的一个模块，它提供了断言测试的函数，用于测试不变库。
 
-[node - assert章节](http://nodejs.cn/api/assert.html)
 
 ```js
 
