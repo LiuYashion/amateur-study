@@ -6,6 +6,31 @@ assert是node中自带的一个模块，它提供了断言测试的函数，用�
 
 [node - assert章节](http://nodejs.cn/api/assert.html)
 
+```js
+
+/** 
+ * 1.0.0
+ * assert 语法 
+ * */
+const assert = require('assert');
+
+assert.equal(1, 1);
+assert.deepStrictEqual({ a: 1 }, { a: 1 });
+
+
+/**
+ * 1.0.1
+ * should 语法
+ */
+var should = require('should');
+(5).should.be.exactly(5).and.be.a.Number();
+
+
+/**
+ * 1.0.2
+ * should 语法
+ */
+```
 
 
 # mocha 测试
