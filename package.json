@@ -5,11 +5,8 @@
   "name": "amateur-study",
   "version": "1.0.0",
   "main": "index.js",
-  "dependencies": {
-    "should": "^13.2.3"
-  },
   "devDependencies": {
-    "mocha": "^5.2.0"
+    "should": "^11.2.1"
   },
   "repository": {
     "type": "git",
