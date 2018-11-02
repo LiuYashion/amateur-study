@@ -1,17 +1,27 @@
-
 var assert = require('assert');
+var should = require('should');
 
+// 断言对象存在
 describe('should断言： exist', ()=>{
   it('{}存在', ()=>{
     should.exist({})
   });
+  it('[]存在', ()=>{
+    should.exist([])
+  });
   it('1存在', ()=>{
     should.exist(1)
+  });
+  it('null不存在', ()=>{
+    should.not.exist(null)
+  });
+  it('undefined不存在', ()=>{
+    should.not.exist(undefined)
   });
 });
 
 
-
+// 断言对象不存在
 describe('should断言： not.exist', ()=>{
   it('null不存在', ()=>{
     should.not.exist(null)
@@ -22,7 +32,7 @@ describe('should断言： not.exist', ()=>{
 });
 
 
-
+// 断言bool值，必须是true、false
 describe('should断言： .false()/.true()', ()=>{
   it('fasle为false', ()=>{
     (false).should.be.false();
@@ -33,7 +43,7 @@ describe('should断言： .false()/.true()', ()=>{
 });
 
 
-
+// 断言js表达式为true
 describe('should断言： ok', ()=>{
   it('NaN不为true', ()=>{
     (NaN).should.not.be.ok;
@@ -90,8 +100,8 @@ describe('should断言： equalOneOf', ()=>{
     'ab'.should.be.oneOf(['a', 10, 'ab']);
   });
   it('oneOf', ()=>{
-    // ({a: 10}).should.be.equalOneOf('a', 10, 'ab', {a: 10});
-    // ({a: 10}).should.be.equalOneOf(['a', 10, 'ab', {a: 10}]);
+    ({a: 10}).should.not.be.equalOneOf('a', 10, 'ab', {a: 10});
+    ({a: 10}).should.not.be.equalOneOf(['a', 10, 'ab', {a: 10}]);
 
     ({a: 10}).should.be.oneOf('a', 10, 'ab', {a: 10});
     ({a: 10}).should.be.oneOf(['a', 10, 'ab', {a: 10}]);
@@ -138,4 +148,116 @@ describe('should断言： match', ()=>{
 
   })
 })
+
+
+
+//  任何一个给出的对象值 或者数组 满足给出的规则
+describe('should断言： matchAny', ()=>{
+  it('matchAny', ()=>{
+    [ 'a', 'b', 'c'].should.matchAny(/\w+/);
+    [ 'a', 'b', 'c'].should.matchAny('a');
+    [ 'a', 'b', 'c'].should.matchAny(function(value) { 
+      value.should.be.eql('a') 
+    });
+    ({ a: 'a', b: 'b', c: 'c' }).should.matchAny(function(value) { 
+      value.should.be.eql('a') 
+    });
+  });
+})
+
+
+
+//  所有给出的对象值 或者数组 满足给出的规则
+describe('should断言： matchEach', ()=>{
+  it('matchEach', ()=>{
+    [ 'a', 'b', 'c'].should.matchEach(/\w+/);
+    [ 'a', 'a', 'a'].should.matchEach('a');
+    [ 'a', 'a', 'a'].should.matchEach(function(value) { value.should.be.eql('a') });
+    ({ a: 'a', b: 'a', c: 'a' }).should.matchEach(function(value) { value.should.be.eql('a') });
+  });
+})
+
+
+
+//  类型判断
+describe('should断言： Infinity | NaN', ()=>{
+  it('Infinity | NaN', ()=>{
+    (10).should.not.be.Infinity();
+    NaN.should.not.be.Infinity();
+    (10).should.not.be.NaN();
+    NaN.should.be.NaN();
+  });
+})
+
+
+//  所有给出的对象值 或者数组 满足给出的规则
+describe('should断言： Infinity | NaN', ()=>{
+  it('Infinity | NaN', ()=>{
+    (10).should.not.be.Infinity();
+    NaN.should.not.be.Infinity();
+    (10).should.not.be.NaN();
+    NaN.should.be.NaN();
+  });
+})
+
+
+
+//  大小比较
+describe('should断言： above | aboveOrEqual | approximately | below | belowOrEqual | within', ()=>{
+  it('Infinity | NaN', ()=>{
+    (10).should.be.above(0);
+
+    (10).should.be.aboveOrEqual(0);
+    (10).should.be.aboveOrEqual(10);
+
+    (9.99).should.be.approximately(10, 0.1);
+
+    (0).should.be.below(10);
+
+    (0).should.be.belowOrEqual(10);
+    (0).should.be.belowOrEqual(0);
+
+    (10).should.be.within(0, 20);
+  });
+})
+
+
+
+
+//  Promise
+describe('should断言： Promise', ()=>{
+  it('Promise', ()=>{
+    (new Promise((resolve, reject) =>{ 
+      resolve(10); 
+    })).should.be.a.Promise();
+    (10).should.not.be.a.Promise();
+  });
+})
+
+
+
+// key
+describe('should断言： key | length', ()=>{
+  it('key', ()=>{
+    ({ a: 10 }).should.have.keys('a');
+    ({ a: 10, b: 20 }).should.have.keys('a', 'b');
+    (new Map([[1, 2]])).should.have.key(1);
+
+  });
+  it('length', ()=>{
+    // length属性
+    [1, 2].should.have.length(2);
+  });
+})
+
+
+
+describe('should断言： value', ()=>{
+  it('key', ()=>{
+    ({ a: 10 }).should.have.value('a', 10);
+    (new Map([[1, 2]])).should.have.value(1, 2);
+  });
+})
+
+
 
