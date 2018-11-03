@@ -575,7 +575,7 @@ describe('Input UI&交互 test', () => {
   })
 
   it('注入props.type为phone，会返回手机号校验正则', () => {
-    ('13260634648').should.match((wrapper.vm.inputReg))
+    ('13200000000').should.match((wrapper.vm.inputReg))
   })
 
   it('输入错的data，会有提示错误信息', () => {
@@ -617,3 +617,4 @@ describe('Input异步 test', () => {
 })
 ```
 
+![avatar](https://github.com/LiuYashion/amateur-study/blob/master/practice-001/result.png)
