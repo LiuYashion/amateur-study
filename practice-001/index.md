@@ -1,4 +1,7 @@
 
+<a href="#should.js 部分释义">should.js 部分释义</a>
+
+
 # node assert
 assert是node中自带的一个模块，用于断言测试。[node - assert章节](http://nodejs.cn/api/assert.html)
 
@@ -406,7 +409,211 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
   ```
 
 
+# vue-cli3.0集成mocha
+> $ vue add @vue/unit-mocha
+> $ npm run test:unit
+
+[get more @](https://vue-test-utils.vuejs.org/zh/api/wrapper/#isempty)
+
+它会自动在项目中生成一个与src同级的test目录
+
+这是一个组件的demo，针对这个demo写了下面几个测试用例
+```html
+<template>
+  <div class='ele-wrap'>
+    <div class="input-wrap">
+
+      <label class="label">
+        {{label}}
+      </label>
+
+      <input 
+        :type="inputType" 
+        class="input" 
+        v-model="value" 
+        @input="onInput"
+        @blur="onBluer"
+        @focus="onFocus"
+        />
+
+      <span 
+        class='clear' 
+        @click="onClear"></span>
+
+      
+
+    </div>
+    <div class='err-msg' v-if='errMsg'>{{errMsg}}</div>
+
+    <button @click="toAsync">
+         异步测试：{{asyncResult}}
+      </button> 
+  </div>
+</template>
+
+<script>
+export default {
+  
+  data(){
+    return {
+      errMsg:'',
+      reg:'',
+      value:'',
+      asyncResult:false
+    }
+  },
+  props: {
+    type: String,
+    label: String,
+    name: String
+  },
+  mounted(){
+    
+  },
+  computed:{
+    inputType: function(){
+      switch (this.type) {
+        case 'phone':
+          return 'number'
+          break;
+        case 'mail':
+          return 'text'
+          break;
+        default:
+          return 'text'
+          break;
+      }
+    },
+    inputReg: function(){
+      switch (this.type) {
+        case 'phone':
+          return /^1[34578]\d{9}$/;
+          break;
+        case 'mail':
+          return /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+          break;
+        default:
+          return 'text'
+          break;
+      }
+    },
+    inputError: function(){
+      switch (this.type) {
+        case 'phone':
+          return '请输入正确的手机号';
+        case 'mail':
+          return '请输入正确的邮箱';
+        default:
+          return 'text'
+      }
+    }
+  },
+  methods:{
+    onInput(){
+      console.log(1111);
+    },
+    onBluer(){
+      let result = this.inputReg.test(this.value)
+      if(!result){
+        this.errMsg = this.inputError
+        this.$emit('Parblur', this.name, '')
+      }else{
+        this.$emit('Parblur', this.name, this.value)
+      }
+      
+    },
+    onFocus(){
+      this.errMsg = ''
+    },
+    onClear(){
+      this.$emit('blur', this.name, this.value)
+      this.value = '';
+      this.errMsg = '';
+    },
+    async toAsync(){
+      // var result = await new Promise((resolve, reject)=>{
+      //   setTimeout(() => {
+      //     resolve(true);
+      //   }, 0);
+      // });
+      // $.ajax({
+      //   type: "GET",
+      //   url: "https://raw.githubusercontent.com/FE-star/exercise1/master/test/test.js",
+      //   success: (res) => {
+      //     console.log(res.slice(0, 10))
+      //     this.asyncResult = true;
+      //   }
+      // })
+      var result = await Promise.resolve(true)
+      this.asyncResult = true;
+    },
+
+  }
+};
+</script>
+```
+
+
+这是对应的几个测试用例
+```js
+
+import should from 'should'
+import { shallowMount, mount } from '@vue/test-utils'
+import Input from '@/components/input.vue'
+
+describe('Input UI&交互 test', () => {
+  const wrapper = shallowMount(Input, { propsData: { type: 'phone', value: 'clear-test' } });
+
+  it('组件应该包含div', () => {
+    wrapper.html().should.match(/div/);
+  });
+
+  it('点击clear应该清除data.value', () => {
+    const button = wrapper.find('span');
+    button.trigger('click');
+    (wrapper.vm.value).should.be.eql('')
+  })
+
+  it('注入props.type为phone，会返回手机号校验正则', () => {
+    ('13260634648').should.match((wrapper.vm.inputReg))
+  })
+
+  it('输入错的data，会有提示错误信息', () => {
+    wrapper.find('input').trigger('blur');
+    (wrapper.vm.errMsg).should.be.ok()
+  })
+})
+
+
+describe('Input事件 test', () => {
+  const wrapper = shallowMount(Input, { propsData: { type: 'phone' } });
+
+  it('失去焦点时会emit一次父方法', () => {
+    wrapper.find('input').trigger('focus');
+    wrapper.find('input').trigger('blur');
+    wrapper.emitted().Parblur.length.should.above(0)
+  })
+
+  it('获得焦点时，会清空错误提示', () => {
+    wrapper.setData({ errMsg: '测试错误信息' });
+    wrapper.find('input').trigger('focus');
+    (wrapper.vm.errMsg).should.be.eql('')
+  })
+})
 
 
 
+describe('Input异步 test', () => {
+  const wrapper = shallowMount(Input, { propsData: { type: 'phone' } });
+
+  it('点击异步按钮时，会异步改变结果？？', (done) => {
+    wrapper.find('button').trigger('click')
+    wrapper.vm.$nextTick(() => {
+      (wrapper.vm.asyncResult).should.be.true();
+      done();
+    })
+  })
+
+})
+```
 
