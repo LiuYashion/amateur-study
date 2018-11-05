@@ -2,15 +2,15 @@
 
 ### 目录格式
 
-```test
-── practice-xxx
+```text
+─ practice-xxx
     ├─ index.js    //  草稿纸
     ├─ index.md    //  记录
     ├─ question.md //  问题markdown
     └─ etc...
 ```
 
-# markdown link 🐼
+### markdown link 🐼
 
 [#01 自动化测试](https://github.com/LiuYashion/amateur-study/blob/master/practice-001/index.md)
 
