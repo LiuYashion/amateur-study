@@ -14,4 +14,4 @@
 
 [#01 自动化测试](https://github.com/LiuYashion/amateur-study/blob/master/practice-001/index.md)
 
-[#02 js语法](https://github.com/LiuYashion/amateur-study/blob/master/practice-002/index.md)
+[#02 basic](https://github.com/LiuYashion/amateur-study/blob/master/practice-002/index.md)
