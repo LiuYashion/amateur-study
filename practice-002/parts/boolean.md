@@ -1,7 +1,7 @@
-## Boolean
-注意bool值为false的若干类型
+# boolean
+
 ```js
-//  这些bool为false
+//  这些数值的Boolean值为false
 Boolean( "" )
 Boolean( 0 )
 Boolean( NaN )
