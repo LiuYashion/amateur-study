@@ -3,25 +3,28 @@
 <meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">    
 <script language="javascript">  
 
-    let sayName = (name) => {
-        console.log(`my name is ${name}`)
-    }
-    let sayAge = (name) => {
-        console.log(`my age is ${name}`)
-    }
 
-    let person = {
-        name: 'LiuYaXiong',
-        age: 18
+
+  function promisify(original) {
+    function fn(...args) {
+      return new Promise((resolve, reject) => {
+        resolve(original.call(this, args))
+      });
     }
+    return fn
+  }
 
-    let promise = new Promise((resolve, reject)=>{
-        resolve(11111)
-    })
 
-    promise.then(res=>{
-        console.log(res)
-    })
+  function readFile(file) {
+    return Promise.resolve(`read ${file} is finished`)
+  }
+
+  const stat = promisify(readFile);
+  stat('.').then((res) => {
+    console.log(res)
+  }).catch((error) => {
+    
+  });
 
 </script>    
 </head>
