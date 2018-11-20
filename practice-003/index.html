@@ -3,25 +3,50 @@
 <meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">    
 <script language="javascript">  
 
-    let sayName = (name) => {
-        console.log(`my name is ${name}`)
-    }
-    let sayAge = (name) => {
-        console.log(`my age is ${name}`)
+
+  /**
+   * 前置
+   */ 
+
+  // Reflect.apply
+  // Reflect.apply方法等同于Function.prototype.apply.call(func, thisArg, args)，用于绑定this对象后执行给定函数。
+
+
+
+  // callbackify 回调话
+  function callbackify(original) {
+    if (typeof original !== 'function') {
+      throw new Error()
     }
 
-    let person = {
-        name: 'LiuYaXiong',
-        age: 18
+    function callbackified(...args) {
+      const maybeCb = args.pop();
+
+      console.log(555, maybeCb);
+
+      if (typeof maybeCb !== 'function') {
+        throw new ERR_INVALID_ARG_TYPE('last argument', 'Function', maybeCb);
+      }
+      const cb = (...args) => { Reflect.apply(maybeCb, this, args); };
+
+      Reflect.apply(original, this, args)
+        .then((ret) => process.nextTick(cb, null, ret),
+              (rej) => process.nextTick(callbackifyOnRejected, rej, cb));
     }
 
-    let promise = new Promise((resolve, reject)=>{
-        resolve(11111)
-    })
+    Object.setPrototypeOf(callbackified, Object.getPrototypeOf(original));
+    Object.defineProperties(callbackified, Object.getOwnPropertyDescriptors(original));
+    return callbackified;
+  }
 
-    promise.then(res=>{
-        console.log(res)
-    })
+  async function fn() {
+    return 'hello world';
+  }
+  const callbackFunction = callbackify(fn);
+  callbackFunction((err, ret) => {
+    if (err) throw err;
+    console.log(ret);
+  });
 
 </script>    
 </head>
