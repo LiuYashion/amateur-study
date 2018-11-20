@@ -25,6 +25,38 @@
   }).catch((error) => {
     
   });
+  /**
+   * 前置
+   */ 
+
+  Reflect.apply
+  // Reflect.apply方法等同于Function.prototype.apply.call(func, thisArg, args)，用于绑定this对象后执行给定函数。
+  
+
+
+  // callbackify 回调话
+  function callbackify(original) {
+    function callbackified(...args) {
+      const maybeCb = args.pop();
+      if (typeof maybeCb !== 'function') {
+        throw new Error();
+      }
+      const cb = (...args) => { Reflect.apply(maybeCb, this, args); };
+      Reflect.apply(original, this, args)
+        .then((ret) => process.nextTick(cb, null, ret),
+              (rej) => process.nextTick(callbackifyOnRejected, rej, cb));
+    }
+    return callbackified;
+  }
+
+  function fn() {
+    return 'hello world';
+  };
+  callbackify(fn)((err, ret) => {
+    if (err) throw err;
+    console.log(ret);
+  });
+
 
 </script>    
 </head>
