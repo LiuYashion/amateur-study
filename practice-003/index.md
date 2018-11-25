@@ -84,6 +84,233 @@ https://www.w3.org/TR/DOM-Level-3-Events/#dom-event-architecture
 http://javascript.ruanyifeng.com/dom/event.html
 思考：自定义事件的应用场景？
 
+# 事件的冒泡与捕获
+
+### 1）preventDefault，stopPropagation，stopImmediatePropagation
+事件的传递顺序是：body->div3->div2->div1->div2->div3->body，捕获然后冒泡。stopPropagation是用来切换这个传递顺序的，所以阻止捕获还是冒泡，需要你自己判断好。对于循环中间的一环div1，如果同时注册了捕获和冒泡，那么两个方法都会触发。这时候可以用stopImmediatePropagation，阻止其他相同事件的监听。
+```html
+<body>
+  <div id='3'>
+      3
+      <div id='2'>
+          2
+          <div id='1'>
+              1
+          </div>
+      </div>
+  </div>
+</body>
+<script>
+
+// 设置为true，在【捕获】阶段触发
+document.getElementById('1').addEventListener('click', function(e){
+    console.log(`#1 click~`)
+    e.stopPropagation()
+    e.stopImmediatePropagation();
+}, true)
+document.getElementById('2').addEventListener('click', function(e){
+    console.log(`#2 click~`)
+    // e.stopPropagation()
+}, true)
+document.getElementById('3').addEventListener('click', function(e){
+    console.log(`#3 click~`)
+    // e.stopPropagation()
+}, true)
+
+
+
+document.getElementById('1').addEventListener('click', function(e){
+    console.log(`#1 click`)
+    e.stopPropagation()
+    // e.stopImmediatePropagation();
+}, false)
+document.getElementById('2').addEventListener('click', function(e){
+    console.log(`#2 click`)
+    // e.stopPropagation()
+}, false)
+document.getElementById('3').addEventListener('click', function(e){
+    console.log(`#3 click`)
+    // e.stopPropagation()
+}, false)
+
+</script>
+```
+
+
+### 2）axios
+先看一个简单的示例，可以发现类似于jq.ajax一样
+```js
+axios({
+  method:'get',
+  url:'http://bit.ly/2mTM3nY',
+  responseType:'stream'
+}).then(function(response) {
+  response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'))
+});
+```
+再来看一些概念：
+
+- Interceptors（拦截器）
+
+  都类似于中间件，管道。对返回值进行处理。
+  ```js
+  // 增加一个请求拦截器，注意是2个函数，一个处理成功，一个处理失败
+  axios.interceptors.request.use(function (config) {
+    return config;
+  }, function (error) {
+    // 请求错误后处理
+    return Promise.reject(error);
+  });
+
+  // 增加一个响应拦截器
+  axios.interceptors.response.use(function (response) {
+    return response;
+  }, function (error) {
+    return Promise.reject(error);
+  });
+  ```
+
+### 3）axios的各个模块
+- HTTP请求模块
+```js
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+  // 其他源码
+  // default adapter是一个可以判断当前环境来选择使用Node还是XHR进行请求发送的模块
+  var adapter = config.adapter || defaults.adapter; 
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+    // 其他源码
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+      // 其他源码
+      return Promise.reject(reason);
+    });
+  };
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  // 只有Node.js才有变量类型为process的类
+  if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // Node.js请求模块
+    adapter = require('./adapters/http');
+  } else if (typeof XMLHttpRequest !== 'undefined') {
+    // 浏览器请求模块
+    adapter = require('./adapters/xhr');
+  }
+  return adapter;
+}
+```
+
+
+- 拦截器模块
+
+  - chain是一个执行队列。这个队列的初始值，是一个带有config参数的Promise。
+  - 在chain执行队列中，插入了初始的发送请求的函数dispatchReqeust和与之对应的undefined。后面需要增加一个undefined是因为在Promise中，需要一个success和一个fail的回调函数，这个从代码promise = promise.then(chain.shift(), chain.shift());就能够看出来。因此，dispatchReqeust和undefined我们可以成为一对函数。
+  - 在chain执行队列中，发送请求的函数dispatchReqeust是处于中间的位置。它的前面是请求拦截器，通过unshift方法放入；它的后面是响应拦截器，通过push放入。要注意的是，这些函数都是成对的放入，也就是一次放入两个。
+
+
+了解了dispatchRequest实现的HTTP请求发送模块，我们来看下axios是如何处理请求和响应拦截函数的。让我们看下axios中请求的统一入口request函数。
+```js
+Axios.prototype.request = function request(config) {
+  // 其他代码
+  var chain = [dispatchRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    chain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+  while (chain.length) {
+    promise = promise.then(chain.shift(), chain.shift());
+  }
+  return promise;
+};
+```
+  
+
+
+- 取消请求模块
+
+首先，让我们来看下元数据Cancel类。它是用来记录取消状态一个类，具体代码如下：
+```js
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+// 而在CancelToken类中，它通过传递一个Promise的方法来实现了HTTP请求取消，然我们看下具体的代码：
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+// 而在adapter/xhr.js文件中，有与之相对应的取消请求的代码：
+if (config.cancelToken) {
+  // 等待取消
+  config.cancelToken.promise.then(function onCanceled(cancel) {
+    if (!request) {
+      return;
+    }
+
+    request.abort();
+    reject(cancel);
+    // 重置请求
+    request = null;
+  });
+}
+
+```
+# axios的设计有什么值得借鉴的地方
+### 1）发送请求函数的处理逻辑
+在之前的章节中有提到过，axios在处理发送请求的dispatchRequest函数时，没有当做一个特殊的函数来对待，而是采用一视同仁的方法，将其放在队列的中间位置，从而保证了队列处理的一致性，提高了代码的可阅读性。
+
+### 2）Adapter的处理逻辑
+在adapter的处理逻辑中，axios没有把http和xhr两个模块（一个用于Node.js发送请求，另一个则用于浏览器端发送请求）当成自身的模块直接在dispatchRequest中直接饮用，而是通过配置的方法在default.js文件中进行默认引入。这样既保证了两个模块间的低耦合性，同时又能够为今后用户需要自定义请求发送模块保留了余地。
+
+### 3）取消HTTP请求的处理逻辑
+在取消HTTP请求的逻辑中，axios巧妙的使用了一个Promise来作为触发器，将resolve函数通过callback中参数的形式传递到了外部。这样既能够保证内部逻辑的连贯性，也能够保证在需要进行取消请求时，不需要直接进行相关类的示例数据改动，最大程度上避免了侵入其他的模块。
+
+
+
 # 事件代理和委托
 [知乎专栏](https://zhuanlan.zhihu.com/p/26536815)
 
@@ -231,7 +458,6 @@ function promisify(original) {
 }
 ```
 
-是的发送到阿斯蒂芬奥术大师多
 
 ```js
 function callbackify(original) {
@@ -261,6 +487,60 @@ function callbackify(original) {
   return callbackified;
 }
 ```
+
+### 3）几种异步流程
+
+```js
+
+// callback
+module.exports = function(cb) {
+  fs.readFile('../data/A.txt', function(err, A) {
+    if (err) throw err;
+    fs.readFile('../data/B.txt', function(err, B) {
+      if (err) throw err;
+      cb(parseInt(A, 10) + parseInt(B, 10));
+    });
+  });
+};
+
+
+
+
+// promise
+// promisify callbackify
+const readFile = util.promisify(fs.readFile);
+module.exports = async function(cb) {
+  let A = await readFile('../data/A.txt');
+  let B = await readFile('../data/B.txt');
+  cb(parseInt(A, 10) + parseInt(B, 10));
+};
+
+
+
+
+
+
+// generator
+function* files() {
+  yield '../data/A.txt';
+  yield '../data/B.txt';
+}
+function iterator(files, results, cb) {
+  let file = files.next();
+  if (file.done) return cb(results);
+  fs.readFile(file.value, function(err, data) {
+    results.push(data);
+    iterator(files, results, cb);
+  });
+}
+module.exports = function(cb) {
+  iterator(files(), [], function (data) {
+    let [A, B] = data;
+    cb(parseInt(A, 10) + parseInt(B, 10));
+  });
+};
+```
+
 
 
 
@@ -315,6 +595,3 @@ xxxx().then(res=>{
 
 ```
 
-
-
-# promisify

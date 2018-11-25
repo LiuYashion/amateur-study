@@ -7,7 +7,7 @@ let sayAge = (name) => {
 
 let person = {
   name: 'LiuYaXiong',
-  age: 18
+  age: 18,
 }
 
 let promise = new Promise((resolve, reject)=>{
