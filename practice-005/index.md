@@ -1,5 +1,7 @@
 # 错误监控
-https://github.com/happylindz/blog/issues/5
+https://github.com/happylindz/blog/issues/5；
+https://zhuanlan.zhihu.com/p/26085642；
+
 
 ### 1）window.onerror
 这些都能监听js的error。window.onerror 捕获异常能力比 try-catch 稍微强点，无论是异步还是非异步错误，onerror 都能捕获到运行时错误。另外 onerror 是无法捕获到网络异常的错误。
@@ -72,10 +74,18 @@ report(1010)
 
 
 # 性能上报
+### 1）performance
 ```js
 let { navigation , timing, timeOrigin  } = window.performance
-
 ```
+
+### 2）监控的流程
+
+
+
+
+
+
 
 # 拓展
 
@@ -108,7 +118,7 @@ function logData() {
 ```
 
 ### 2）badjs
-$ npm install badjs-report
+$ npm install badjs-report，其实是重写了window.onerror。可以看看源码。
 ```js
 BJ_REPORT.init({
   id: 1,                                // 上报 id, 不指定 id 将不上报
@@ -134,3 +144,58 @@ http://fex.baidu.com/blog/2014/05/build-performance-monitor-in-7-days/
 
 ### 5）最佳实践
 https://mp.weixin.qq.com/s/YiKRY_LDURY0uONtEhkUfg 值得阅读
+
+
+
+
+# Class
+
+### 1）需要监控的指标
+- monitor 累积量的上报
+- huotuo  测速上报
+- badjs   脚本错误上报
+- tdbank  用户行为上报（画漏斗图，用户转换率）
+
+### 2）文件跨域
+- 跨域js文件的服务端设置cros
+- script标签要设置crossorigin属性
+
+### 3）aop切面编程
+AOP是对OOP（面向对象编程）的一个横向的补充，主要作用就是把一些业务无关的功能抽离出来，使这些功能点能够得到很好的复用，给模块解耦。
+
+- 我们先看看es6中的proxy
+```js
+let validateProxy = new Proxy({a: 0, b: 0, c: 0}, {
+  set(target, key, value, receiver) {
+    if (key in target && typeof value !== 'number') {
+      throw new Error('你传了个什么鬼进来');
+    }
+    return Reflect.set(target, key, value, receiver);
+  }
+});
+
+let setProxy = new Proxy(validateProxy, {
+  set(target, key, value, receiver) {
+    let done = Reflect.set(target, key, value, receiver);
+    if (key === 'b' || key === 'c') {
+      Reflect.set(target, 'a', target.b + target.c, receiver);
+    }
+    return done;
+  }
+});
+
+setProxy.b = 10
+console.log(setProxy) // {a: 10, b: 10, c: 0}
+```
+
+现在我们举个例子，场景：有三个变量a、b、c，要保证b、c在修改前后，a一直等于b与c的和。
+这里有一个切面，即在业务逻辑走完之后，需要重新将b+c赋值给c。通过上面的代理，我们就能完成需求。
+
+
+
+# 杂项
+
+### 1）
+```
+mongod --dbpath=D:\data
+```
