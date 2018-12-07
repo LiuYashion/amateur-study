@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <META http-equiv=Content-Type content="text/html; charset=utf-8">
+  </head>
+  <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js"></script>
+  <body>
+    <h1>关于HTML编码</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>姓名</th>
+          <th>性别</th>
+          <th>年龄</th>
+          <th>个人主页</th>
+        </tr>
+      </thead>
+      <tbody id="tableList"></tbody>
+    </table>
+    
+
+    <script id="table-template" type="text/x-handlebars-template">
+      {{#each student}}
+        <tr>
+          <td>{{name}}</td>
+          <td>{{sex}}</td>
+          <td>{{age}}</td>
+          {{#compare age 20}}
+            <td>{{homePage}}</td>
+          {{else}}
+            <td>{{{homePage}}}</td>
+          {{/compare}}
+        </tr> 
+      {{/each}}
+    </script>
+    
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var data = { "student": [
+          { "name": "张三", "sex": "0", "age": 18, "homePage":"<a href='javascript:void(0);'>张三的个人主页</a>" },
+          { "name": "李四", "sex": "0", "age": 22, "homePage":"<a href='javascript:void(0);'>张三的个人主页</a>" },
+          { "name": "妞妞", "sex": "1", "age": 19, "homePage":"<a href='javascript:void(0);'>妞妞的个人主页</a>" }
+        ]};
+        
+        //  注册一个Handlebars模版，通过id找到某一个模版，获取模版的html框架
+        var myTemplate = Handlebars.compile($("#table-template").html());
+        
+        //  注册一个比较数字大小的Helper,有options参数，块级Helper
+        Handlebars.registerHelper("compare", function(v1, v2, options){
+          if(v1 > v2){
+            return options.fn(this);
+          }else{
+            return options.inverse(this);
+          }
+        });
+        
+        //  将json对象用刚刚注册的Handlebars模版封装，得到最终的html，插入到基础table中。
+        $('#tableList').html(myTemplate(data));
+      });
+    </script>
+  </body>
+</html>
