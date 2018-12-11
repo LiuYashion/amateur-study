@@ -86,7 +86,6 @@ console.log(output)
 
 这样，我们就创建好了const add = function(){}的AST对象
 
-
 ## 我们能做的还有更多
 除了解释，打印，重组这些功能以外。recats还有其他的功能。
 
@@ -99,4 +98,8 @@ ast节点遍历
 ### recats.visit
 判断ast节点类型
 
-https://mp.weixin.qq.com/s/EnS22WGKiXnTCdFnqrVahA
+
+
+
+# 现在我们实战一下
+
