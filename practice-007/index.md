@@ -29,9 +29,6 @@ https://developers.google.cn/web/fundamentals/performance/why-performance-matter
 
 
 
-
-
-
 http://www.cnblogs.com/vajoy/p/5341664.html
 
 
@@ -82,3 +79,13 @@ Cache-Control: min-fresh=<seconds>
 
 
 # 客户端缓存
+
+### localStorage + sessionStorage
+
+### Service Worker
+
+# Service Worker
+离线体验，定时后台同步，推送通知。这些通常都需要一个本地应用才能实现，但现在使用Service Worker就能使用这些功能了。
+
+SW是一个脚本，独立于当前网页，在后台运行。为了实现一些不依赖页面的功能（想想我们app不就是这样吗），这个API是令人振奋的，因为这使得开发人员能够实现离线功能了。
+
