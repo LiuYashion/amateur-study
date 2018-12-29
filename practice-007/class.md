@@ -26,7 +26,7 @@ html：no-cache，css/js：md5/timestamp/version + 长缓存，image：随机名
 ### localStorage
 浏览器给每个域名分配了5m的内容，a.meituan.com/b.meituan.com不是一个域，如果存超了，会存不进去然后js报错。可以考虑降级存在sessionStorage中，这里就会遇到问题：sessioStorage是一次会话中共享，如果是新建的webview那就访问不到了；再考虑降级到cookie，这样就可能因为过大被413拦截；单页面应用共享就很简单。当然最好的就是规避问题，划分好域名，考虑单页面应用，最后不行只能请你掉别人的，给自己localstorage的key加一个前缀。
 
-# hybrid
+# hybrid 
 service worker出来，所以离线缓存得到了实现，rn / weex，
 https://yq.aliyun.com/articles/2939
 
@@ -44,3 +44,6 @@ for 比 forEach性能要好
 benchmark
 
 map set
+
+
+

@@ -18,5 +18,8 @@
     "url": "https://github.com/LiuYashion/amateur-study/issues"
   },
   "homepage": "https://github.com/LiuYashion/amateur-study#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "tapable": "^2.0.0-beta.2"
+  }
 }
