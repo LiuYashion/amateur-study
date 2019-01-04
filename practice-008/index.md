@@ -37,9 +37,95 @@ https://zhuanlan.zhihu.com/qianduandaha
 
   见下面
 
-### 3.1）lazyload
+### 3.1）lazyload懒加载
 懒加载在长网页中延迟加载图像，原理：首先将页面上的图片的 src 属性设为空字符串，而图片的真实路径则设置在data-original属性中，
 当页面滚动的时候需要去监听scroll事件，在scroll事件的回调中，判断我们的懒加载的图片是否进入可视区域,如果图片在可视区内将图片的 src 属性设置为data-original 的值，这样就可以实现延迟加载
 ```html
 <img src="" class="image-item" lazyload="true"  data-original="images/1.png"/>
 ```
+```js
+rect = item.getBoundingClientRect() 
+//  用于获得页面中某个元素的左，上，右和下分别相对浏览器视窗的位置
+if ( rect.bottom>=0 && rect.top < viewHeight ) {
+  var img = new Image()
+  img.src = item.dataset.original
+  img.onload = function(){
+    item.src = img.src
+  }
+  item.removeAttribute（"data-original"）
+  //  移除属性，下次不再遍历
+  item.removeAttribute（"lazyload"）
+}
+```
+
+
+
+### 3.2）preload预加载
+原理就是讲所有资源预先下载，后面需要时直接使用缓存即可。在网页全部加载之前，对一些主要内容进行加载，以提供给用户更好的体验，减少等待的时间。否则，如果一个页面的内容过于庞大，没有使用预加载技术的页面就会长时间的展现为一片空白，直到所有内容加载完毕。这里是几种方法：
+
+- html标签
+  ```html
+  <img src="http://pic26.nipic.com/20121213/61681830044449030002.jpg" style="display:none"/>
+  ```
+
+- image对象
+  ```js
+  var image = new Image()
+  image.src = "http://pic26.nipic.com/20121213/61681830044449030002.jpg"
+  ```
+
+- XMLHttpRequest对象
+  
+  ```js
+  var xmlhttprequest = new XMLHttpRequest();
+  xmlhttprequest.onreadystatechange = callback;
+  xmlhttprequest.onprogress = progressCallback;
+  xmlhttprequest.open("GET", "http://image.baidu.com/mouse,jpg", true);
+  xmlhttprequest.send();
+  function callback(){
+    if ( xmlhttprequest.readyState == 4 && xmlhttprequest.status == 200 ) {
+      var responseText = xmlhttprequest.responseText;
+    } else {
+      console.log("Request was unsuccessful:" + xmlhttprequest.status);
+    }
+  }
+  function progressCallback(e){
+    e = e || event;
+    if(e.lengthComputable){
+      console.log("Received" + e.loaded + "of" + e.total + "bytes")
+    }
+  }
+  ```
+
+- PreloadJS库
+  
+  ```js
+  var queue = new createjs.LoadQueue();
+  //  默认是xhr对象，如果是new createjs.LoadQueue(false)是指使用HTML标签，可以跨域
+  queue.on("complete", handleComplete, this);
+  queue.loadManifest([{
+    id: "myImage", 
+    src: "http://pic26.nipic.com/20121213/61681830044449030002.jpg"
+  }, {
+    id: "myImage2", 
+    src: "http://pic9.nipic.com/20100814/28395261931471581702.jpg"
+  }]);
+  function handleComplete () {
+    var image = queue.getResuLt("myImage");
+    document.body.appendChild(image);
+  }
+
+  ```
+
+### 3.3）懒加载与预加载对比
+两者都是提高页面性能有效的办法，两者主要区别是一个是提前加载，一个是迟缓甚至不加载。懒加载对服务器前端有一定的缓解压力作用，预加载则会增加服务器前端压力
+
+
+### 3.4）更对的优化
+https://juejin.im/post/5b022bdf518825426d2d69fe
+
+
+### 4）大列表合并
+数据长度大于1000，且不能分页展示的列表。我们叫做大列表。
+
+https://zhuanlan.zhihu.com/p/26022258
