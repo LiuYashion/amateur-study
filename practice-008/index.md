@@ -129,3 +129,73 @@ https://juejin.im/post/5b022bdf518825426d2d69fe
 数据长度大于1000，且不能分页展示的列表。我们叫做大列表。
 
 https://zhuanlan.zhihu.com/p/26022258
+
+解决方法有两种：
+
+- 懒渲染
+
+  一个屏幕一个屏幕的渲染
+  ```js
+  const maxScrollTop = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
+  const currentScrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+  ​
+  if (maxScrollTop - currentScrollTop < 20) {
+    //...
+  }
+  ```
+
+- 可视区渲染
+
+  只渲染可见部分的，不可见部分不渲染。滚动条滚动时，动态更新列表选项。
+
+### 4）其他优化
+
+
+
+# QUIC
+QUIC（quick udp internet connection）即为快速UDP互联网连接，是由google提出的使用UDP进行多路并发传输的协议
+
+
+
+### 现状
+至今为止，大部分互联网流量传输协议只使用了几个网络协议（ipv4进行路由，tcp进行连接，SSL/TSL传输安全，DNS解析，HTTP传输），然而这些协议的发展都很缓慢。tcp主要是拥塞算法的改进，ipv4虽然升级到了ipv6，但是部署的进度十分缓慢
+
+
+
+### 那么问题来了
+网络交互越来越丰富，传输内容越来越大，很多问题凸显了出来
+- 中间设备僵化
+  
+  TCP协议使用太久，导致形成了一些约定俗成的操作：防火墙只允许80和443端口通过，NAT网关在转换网络地址时重写传输层的头部等等
+
+- 依赖操作系统导致的协议僵化
+
+  windowXP任然有大部分用户在使用，所以导致系统升级滞后。比如TCP Fast Open，虽然2013年就被提出来了，但是windows很多版本都不支持它
+
+- 建立连接的握手延迟大
+
+  http、https系列都使用了tcp进行传输。tcp三次握手导致的延迟
+
+- 队头阻塞
+
+  队头阻塞是TCP协议的可靠性机制引入的，TCP是使用序列号来标识数据顺序的，如果前面数据丢失，后面数据就算到达了也不会处理，TSL类似，丢失了数据也会导致整个record无法正确处理，所以在现有的TCP，TSL之上再实现新的应用层协议，阻力是很大的
+
+### 有好的方案吗？
+所以QUIC使用了UDP协议，ORTT连接。没有握手，所以也就没有握手延迟。然后在应用程序面实现了TCP的可靠性，TLS的安全性，HTTP2的并发性，只要用户端和服务端的应用程序支持QUIC程序，就能完全避开操作系统和中间设备的限制
+
+
+
+### QUIC的改进
+
+- 减少了TCP三次握手与TSL握手时间
+- 改进了的拥塞机制
+- 避免队头阻塞的多路复用
+- 连接迁移
+- 向前冗余纠错
+
+
+
+
+
+
+
