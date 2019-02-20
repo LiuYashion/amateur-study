@@ -110,7 +110,7 @@ class Clock extends React.Component {
 
 
 ## 5.0 Handling Events
-事件处理
+事件处理, 需要注意的就是绑定好this
 ```js
 function ActionLink() {
   function handleClick(e) {
@@ -125,4 +125,62 @@ function ActionLink() {
     </a>
   );
 }
+
+
+/** 构造器中绑定this */
+class Toggle extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {isToggleOn: true};
+
+    // This binding is necessary to make `this` work in the callback
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    this.setState(state => ({
+      isToggleOn: !state.isToggleOn
+    }));
+  }
+  //或者直接用箭头函数默认绑定this
+  handleClick = () => {
+    console.log('this is:', this);
+  }
+
+  render() {
+    return (
+      <button onClick={this.handleClick}>
+        {this.state.isToggleOn ? 'ON' : 'OFF'}
+      </button>
+
+      // 或者onclick的时候 使用箭头函数
+      // 唯一的一个小问题就是 这个箭头函数每次渲染都是会重新生成的
+      // 所以当它作为pros传入子组件时 会触发子组件额外一次渲染
+      // <button onClick={(e) => this.handleClick(e)}>
+      //   Click me
+      // </button>
+
+    );
+  }
+}
+
+ReactDOM.render(
+  <Toggle />,
+  document.getElementById('root')
+);
+
+/** 传入额外的参数 */
+<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
+<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+
+```
+
+
+
+## 6.0 Conditional Rendering
+条件渲染, 我们可以使用各种条件语句,
+当我们不想要render的时候 直接return null;
+当然, 子组件的componentDidUpdate仍然会被触发
+```js
+
 ```
