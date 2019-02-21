@@ -59,4 +59,28 @@ function NumberList(props) {
 }
 ```
 
+- 我们把map方法植入到jsx语法中
+```js
+function NumberList(props) {
+  const numbers = props.numbers;
+  return (
+    <ul>
+      {numbers.map((number) =>
+        <ListItem key={number.toString()}
+                  value={number} />
+      )}
+    </ul>
+  );
+}
+```
 
+
+
+## 8.0 Forms
+Form是react的一个独特的组件,因为它自己内部还要维护一些状态,
+```js
+
+```
+
+## 9.0 Lifting State Up
+提升state
