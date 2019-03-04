@@ -38,22 +38,64 @@ module.exports = TestPlugin
 
 ```js
 TestPlugin.prototype.apply = function (compiler) {
+
   compiler.plugin('emit', function(compilation, callback) {
+
     compilation.chunks.forEach(function(chunk) {
+
       chunk.modules.forEach(function(module) {
         module.fileDependencies.forEach(function(filepath) {
         });
       });
+
       chunk.files.forEach(function(filename) {
         var source = compilation.assets[filename].source();
       });
+
     });
     callback();
+
   });
+
 }
 ```
 
+## validateOptions （schema-utils）
+参数的一些校验方法
+
+# BannerPlugin
+https://github.com/webpack/webpack/blob/master/lib/BannerPlugin.js
+```js
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 # 看看html-webpack-plugin
+作用：
+- 为html文件中引入的外部资源如script、link动态添加
+- 每次compile后的hash，防止引用缓存的外部文件问题
+- 可以生成创建html入口文件
+
+原理：
+
+将webpack中`entry`配置的相关入口的thunk。还有`extract-text-webpack-plugin`抽取的css样式。一起插入到该插件提供的`template`或者`templateContent`配置项指定的内容基础上。具体插入方式是将样式`link`插入到`head`元素中，`script`插入到`head`或者`body`中
+
+几个概念：
+- compiler：
+- new WeakMap();
+```js
+
+```
 
 ```js
 class HtmlWebpackPlugin {
