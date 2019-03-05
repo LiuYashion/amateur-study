@@ -28,11 +28,36 @@ module.exports = TestPlugin
 - 设置在使用中间件的时候进一步提升性能；
 - 等等...
 
+# 介绍两个对象
 
-## 那我们来看看一些api
+## compiler
+代表整个webpack环境配置。启动时配置好并被建立，每个运行的插件，将会收到这个compiler的引用，可以通过它来访问webpack环境
+
+## compilation
+代表一次版本的构建。当运行webpack-dev-middleware时，梅检测到一次变化，就会创建一个新的构建版本（compilation），从而生成一组新的编译资源，它提供了很多有用的回调
+
+## compiler.hooks.(..)
+这里枚举一些钩子（遇到时可以查看文档）
+
+- ### compile
+  一个新的编译(compilation)创建之后，钩入(hook into) compiler
+- ### compilation
+  编译(compilation)创建之后，执行插件
+- ### emit
+  生成资源到 output 目录之前
+
+...
+
+
+
+
+# 那我们来看看一些api
 - compilation.modules：一次构建中，模块组成的数组；
-- module.fileDependencies：模块中源文件与依赖文件的路径；
 - compilation.chunks：一次构建中，chunks组成的数组；
+
+- module.fileDependencies：模块中源文件与依赖文件的路径；
+
+
 - chunk.modules：每个chunk里面的模块数组；
 - chunk.files：每个chunk里面的输出文件名；
 
@@ -60,16 +85,42 @@ TestPlugin.prototype.apply = function (compiler) {
 }
 ```
 
-## validateOptions （schema-utils）
-参数的一些校验方法
+> validateOptions （schema-utils）
+>
+> 参数的一些校验方法，定义好模式，然后传入data检验
 
-# BannerPlugin
-https://github.com/webpack/webpack/blob/master/lib/BannerPlugin.js
+# tabable
+tapable里面是各种同步异步对流程的控制，参看tapable
+
+# 来看看几个插件吧~
+
+## #1 BannerPlugin
 ```js
-
+apply(compiler) {
+  /** 构建完成之后执行 */
+  compiler.hooks.compilation.tap('bannerPlugin', compilation => {
+    /** 优化所有chunk的资源，资源被存在compilation.assets中 */
+    compilation.hooks.optimizeChunkAssets.tap('bannerPlugin', chunks => {
+      for (const chunk of chunks) {
+        for (const file of chunk.files) {
+          compilation.assets[file] = new ConcatSource(
+            '\/**LiuYashion Banner**\/',
+            "\n",
+            compilation.assets[file]
+          );
+        }
+      }
+    })
+  })
+}
 ```
 
+## #2 html-webpack-plugin
+```js
+apply(compiler) {
 
+}
+```
 
 
 
@@ -98,14 +149,40 @@ https://github.com/webpack/webpack/blob/master/lib/BannerPlugin.js
 ```
 
 ```js
+/**
+ * 此处自己维护了一个childCompiler
+ */
+const childCompiler = require('./lib/compiler.js');
+
 class HtmlWebpackPlugin {
   constructor (options) {
   }
 
   apply (compiler) {
-    /**
-     *  此处对文件的路径做了处理
-     */
+
+    /** 此处对文件的路径做了处理 */
+
+    // Clear the cache once a new HtmlWebpackPlugin is added
+    childCompiler.clearCache(compiler);
+
+    // 触发 compilation 事件之前执行
+    compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
+      /**
+       * 1. 将template和【childCompiler】绑定起来
+       */
+    })
+
+    // 异步并发
+    compiler.hooks.make.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
+
+    })
+
+    // 生成资源到 output 目录之前
+    compiler.hooks.emit.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
+
+    })
+
+
   }
 }
 ```
