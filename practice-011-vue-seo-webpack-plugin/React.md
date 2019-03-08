@@ -1,14 +1,11 @@
-
-# React or Vue
-
-## js框架存在的原因
-UI与状态同步十分困难,各种input focus事件都需要处理
+# js框架存在的原因
+UI与状态同步十分困难。各种input focus事件都需要处理，所以需要一种框架来帮助我们自动实现同步
 
 那么是如何同步的呢?
+- react比较虚拟dom，再映射成真实的dom
+- vue观察者模式，当被监听的属性变化时，属性的dom重新渲染
 
-- react 比较虚拟dom,再映射成真是的dom
-- vue 观察者模式,当被监听的属性变化时,属性的dom重新渲染
-
+# 一些关于react的方法
 ## 1.0 JSX
 JSX是js的一个语法拓展,用来定义UI是什么样子的,一种模板
 ```js
@@ -184,3 +181,88 @@ ReactDOM.render(
 ```js
 
 ```
+
+
+
+## 7.0 Lists and Keys
+我们来渲染一个lists
+```js
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map((number) => number * 2);
+
+// [2, 4, 6, 8, 10]
+console.log(doubled);
+```
+
+- lists
+这里会报错,因为每个li都没有对应的key标识, key能保证列表渲染时的稳定
+```js
+function NumberList(props) {
+  const numbers = props.numbers;
+  const listItems = numbers.map((number) =>
+    <li>{number}</li>
+  );
+  return (
+    <ul>{listItems}</ul>
+  );
+}
+
+const numbers = [1, 2, 3, 4, 5];
+ReactDOM.render(
+  <NumberList numbers={numbers} />,
+  document.getElementById('root')
+);
+```
+
+- lists里面 key的位置
+key应该设置在直接被map的组件上, 而且key必须唯一
+```js
+function ListItem(props) {
+  const value = props.value;
+  return (
+    // Wrong! There is no need to specify the key here:
+    <li key={value.toString()}>
+      {value}
+    </li>
+  );
+}
+
+function NumberList(props) {
+  const numbers = props.numbers;
+  const listItems = numbers.map((number) =>
+    // Wrong! The key should have been specified here:
+    <ListItem value={number} />
+  );
+  return (
+    <ul>
+      {listItems}
+    </ul>
+  );
+}
+```
+
+- 我们把map方法植入到jsx语法中
+```js
+function NumberList(props) {
+  const numbers = props.numbers;
+  return (
+    <ul>
+      {numbers.map((number) =>
+        <ListItem key={number.toString()}
+                  value={number} />
+      )}
+    </ul>
+  );
+}
+```
+
+
+
+## 8.0 Forms
+Form是react的一个独特的组件,因为它自己内部还要维护一些状态,
+```js
+
+```
+
+## 9.0 Lifting State Up
+提升state

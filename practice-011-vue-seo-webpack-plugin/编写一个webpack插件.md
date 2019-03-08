@@ -44,7 +44,7 @@ module.exports = TestPlugin
 
 - ### compilation
   编译(compilation)创建之后，执行插件
-  
+
 - ### emit
   生成资源到 output 目录之前
 

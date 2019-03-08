@@ -24,7 +24,7 @@
 
 指令还支持直接输入对象字面量
 
-Vue Directive的生命周期方法能让我们更优雅的去在合适的时机进行DOM的操作，而在ViewModel里则没有和DOM元素对应的方法。因为Vue Directive是属于View层面的，所以DOM操作应该被封装在Vue Directive里而不是出现在Vue实例中。 
+Vue Directive的生命周期方法能让我们更优雅的去在合适的时机进行DOM的操作，而在ViewModel里则没有和DOM元素对应的方法。因为Vue Directive是属于View层面的，所以DOM操作应该被封装在Vue Directive里而不是出现在Vue实例中。
 
 下面我们实操一个vue directive的操作，我们来自制scroll指令,
 
