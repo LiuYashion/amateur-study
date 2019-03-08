@@ -24,7 +24,7 @@ g.next(20)        // {value: 50, done: true}
 g.next()          // {value: 3, done: true}
 g.next()          // {value: undefined, done: true}
 ```
-从结果能看出，执行一次next状态就变化一次。
+从结果能看出，执行一次next状态就变化一次。仔细看传的值，
 
 https://segmentfault.com/a/1190000012233339
 https://juejin.im/post/5a6db41351882573351a8d72
