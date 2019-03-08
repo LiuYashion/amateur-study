@@ -41,8 +41,10 @@ module.exports = TestPlugin
 
 - ### compile
   一个新的编译(compilation)创建之后，钩入(hook into) compiler
+
 - ### compilation
   编译(compilation)创建之后，执行插件
+  
 - ### emit
   生成资源到 output 目录之前
 
@@ -115,23 +117,13 @@ apply(compiler) {
 }
 ```
 
-## #2 html-webpack-plugin
-```js
-apply(compiler) {
-
-}
-```
 
 
 
 
 
 
-
-
-
-
-# 看看html-webpack-plugin
+# html-webpack-plugin
 作用：
 - 为html文件中引入的外部资源如script、link动态添加
 - 每次compile后的hash，防止引用缓存的外部文件问题
@@ -141,48 +133,5 @@ apply(compiler) {
 
 将webpack中`entry`配置的相关入口的thunk。还有`extract-text-webpack-plugin`抽取的css样式。一起插入到该插件提供的`template`或者`templateContent`配置项指定的内容基础上。具体插入方式是将样式`link`插入到`head`元素中，`script`插入到`head`或者`body`中
 
-几个概念：
-- compiler：
-- new WeakMap();
-```js
+> https://github.com/lcxfs1991/blog/issues/1
 
-```
-
-```js
-/**
- * 此处自己维护了一个childCompiler
- */
-const childCompiler = require('./lib/compiler.js');
-
-class HtmlWebpackPlugin {
-  constructor (options) {
-  }
-
-  apply (compiler) {
-
-    /** 此处对文件的路径做了处理 */
-
-    // Clear the cache once a new HtmlWebpackPlugin is added
-    childCompiler.clearCache(compiler);
-
-    // 触发 compilation 事件之前执行
-    compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
-      /**
-       * 1. 将template和【childCompiler】绑定起来
-       */
-    })
-
-    // 异步并发
-    compiler.hooks.make.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
-
-    })
-
-    // 生成资源到 output 目录之前
-    compiler.hooks.emit.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
-
-    })
-
-
-  }
-}
-```
