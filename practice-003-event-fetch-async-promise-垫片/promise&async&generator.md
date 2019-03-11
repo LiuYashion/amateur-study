@@ -24,7 +24,80 @@ g.next(20)        // {value: 50, done: true}
 g.next()          // {value: 3, done: true}
 g.next()          // {value: undefined, done: true}
 ```
-从结果能看出，执行一次next状态就变化一次。仔细看传的值，
+从结果能看出，执行一次next状态就变化一次。仔细看传的值，传入的参数会被当做上一个yeild表达式的值，
 
-https://segmentfault.com/a/1190000012233339
-https://juejin.im/post/5a6db41351882573351a8d72
+# async | await
+
+async 函数，就是 Generator 函数的语法糖。
+
+这两个关键字用于写异步函数的时候使用。比如下一次请求会依赖上一次请求的内容时，就可以使用await等待，而不用再写链式调用。
+
+- 凡是在前面添加了async的函数在执行后都会自动返回一个Promise对象
+- await必须在async函数里使用，不能单独使用
+- await后面需要跟Promise对象，不然就没有意义，而且await后面的Promise对象不必写then，因为await的作用之一就是获取后面Promise对象成功状态传递出来的参数
+- await会使它之后的代码变成同步的
+
+## demo
+```js
+/** 我们定义一个成功失败五五开的方法 */
+async function asyncResult() {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  if (Boolean(Math.round(Math.random()))) {
+    return 'Finish'
+  }
+  throw Error('Error')
+}
+
+/** 我们来合理调用它 */
+async function foo() {
+  try {
+    return await asyncResult()
+  }
+  catch (e) {
+    // 错误也是能够捕获的，因为我们在try中等待了asyncResult
+    return 'caught'
+  }
+}
+```
+
+下面这个例子可以用来看看，代码的执行顺序
+```js
+console.log(1)
+let promiseDemo = new Promise((resolve, reject) => {
+    console.log(2)
+    setTimeout(() => {
+        let random = Math.random()
+        if (random >= 0.2) {
+            resolve('success')
+            console.log(3)
+        } else {
+            reject('failed')
+            console.log(3)
+        }
+    }, 1000)
+})
+
+async function test() {
+    console.log(4)
+    let result = await promiseDemo
+    return result
+}
+
+test().then(result => {
+    console.log(5)
+}).catch((result) => {
+    console.log(5)
+})
+console.log(6)
+```
+
+
+
+# Promise
+new Promise的时候，内部代码就会执行
+
+##
+
+
+
+https://juejin.im/post/5c39523651882525a67c53d6
