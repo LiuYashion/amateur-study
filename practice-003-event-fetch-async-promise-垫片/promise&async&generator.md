@@ -96,7 +96,70 @@ console.log(6)
 # Promise
 new Promise的时候，内部代码就会执行
 
-##
+## demo
+promise内的代码会立即执行，
+```js
+let promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('foo')
+  }, 1000)
+})
+```
+
+## 这里看几个并发，竞态的api
+```js
+/**
+  Promise.all()
+  全都都resolve了才会执行
+ */
+let promise1 = Promise.resolve(3)
+let promise2 = 4
+let promise3 = new Promise(resolve=>{
+  setTimeout(()=>{
+    resolve(6)
+  },1000)
+})
+Promise.all([promise1, promise2, promise3]).then(result => {
+  console.log(result) // [3, 4, 6]
+})
+
+
+/**
+  Promise.race()
+  最先完成的返回
+ */
+let promise1 = Promise.resolve(3)
+let promise2 = 4
+let promise3 = new Promise(resolve=>{
+  setTimeout(()=>{
+    resolve(6)
+  },1000)
+})
+Promise.race([promise1, promise2, promise3]).then(result => {
+  console.log(result) // 3
+})
+
+
+/**
+  Promise.finally()
+  最后总会执行
+ */
+new Promise((resolve, reject)=>{
+  setTimeout(()=>{
+    reject(6)
+  },1000)
+}).then(res => {
+  console.log(1, res)
+}).catch(error => {
+  console.log(2, error)
+}).finally( () => {
+  console.log(3, res)
+})
+
+
+
+```
+
 
 
 

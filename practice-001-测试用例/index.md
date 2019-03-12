@@ -19,7 +19,7 @@ mocha是一个能够在浏览器和node上运行的测试框架。其中describe
 
 
 
-# should.js 
+# should.js
 should是一个断言库，它与框架无关。相比assert更强更有用
 ```js
 var should = require('should');
@@ -33,7 +33,7 @@ var should = require('should');
   针对一个模块或者函数的测试，叫做单元测试。基本原则是：不同的功能点并且相互之间没有依赖
 
 - TDD
-  
+
   测试驱动开发。首先写测试用例，测试的过程中逐步完成代码，开发顺利的话所有测试通过
 
   我们以TDD模式开发一个阶乘函数
@@ -70,7 +70,7 @@ var should = require('should');
   ```
 
 - BDD
-  
+
   行为驱动开发。相比TDD的测试用例，我们用的是需求文档和行为来驱动开发
 
   我们以TDD模式开发一个阶乘函数
@@ -117,7 +117,7 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
 
 # should.js 部分释义
 - should.exist
-  
+
   断言对象存在
   ```js
   describe('should断言： exist', ()=>{
@@ -142,8 +142,8 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
   });
   ```
 
-- should.false() | true() 
-  
+- should.false() | true()
+
   判断是否为布尔值
   ```js
   describe('should断言： .false()/.true()', ()=>{
@@ -158,8 +158,8 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
 
 
 
-- should.ok 
-  
+- should.ok
+
   判断对象的js表达式的值是否为true
   ```js
   describe('should断言： ok', ()=>{
@@ -173,7 +173,7 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
   ```
 
 
-- should.containDeep | containDeepOrdered 
+- should.containDeep | containDeepOrdered
 
   同级或子级是否包含对象，后者对顺序进行了限制
   ```js
@@ -225,7 +225,7 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
 
 - should.equalOneOf
 - should.oneOf
-  
+
   体会两者不同之处，都是做值得比较的
   ```js
   describe('should断言： equalOneOf', ()=>{
@@ -247,7 +247,7 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
 
 
 - should.match
-  
+
   检验值是否匹配某种规则
   ```js
   describe('should断言： match', ()=>{
@@ -272,14 +272,14 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
       var myString = {};
 
       // this will pass
-      myString.should.match(/abc/);  
+      myString.should.match(/abc/);
       // 如果没有key属性就会通过,所以可以如下
 
       // this will not pass
       assert.throws(()=>{
         myString.should.be.an.Object().and.not.be.empty().and.match(/abc/)
       })
-      
+
 
       // (new Error('boom')).should.match(/abc/);//passed because no keys
       // (new Error('boom')).should.not.match({ message: /abc/ }).should.throw(AssertionError);//check specified property
@@ -297,11 +297,11 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
     it('matchAny', ()=>{
       [ 'a', 'b', 'c'].should.matchAny(/\w+/);
       [ 'a', 'b', 'c'].should.matchAny('a');
-      [ 'a', 'b', 'c'].should.matchAny(function(value) { 
-        value.should.be.eql('a') 
+      [ 'a', 'b', 'c'].should.matchAny(function(value) {
+        value.should.be.eql('a')
       });
-      ({ a: 'a', b: 'b', c: 'c' }).should.matchAny(function(value) { 
-        value.should.be.eql('a') 
+      ({ a: 'a', b: 'b', c: 'c' }).should.matchAny(function(value) {
+        value.should.be.eql('a')
       });
     });
   })
@@ -369,8 +369,8 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
   ```js
   describe('should断言： Promise', ()=>{
     it('Promise', ()=>{
-      (new Promise((resolve, reject) =>{ 
-        resolve(10); 
+      (new Promise((resolve, reject) =>{
+        resolve(10);
       })).should.be.a.Promise();
       (10).should.not.be.a.Promise();
     });
@@ -427,33 +427,33 @@ Travis CI是在线托管的CI服务，用Travis来进行持续集成，不需要
         {{label}}
       </label>
 
-      <input 
-        :type="inputType" 
-        class="input" 
-        v-model="value" 
+      <input
+        :type="inputType"
+        class="input"
+        v-model="value"
         @input="onInput"
         @blur="onBluer"
         @focus="onFocus"
         />
 
-      <span 
-        class='clear' 
+      <span
+        class='clear'
         @click="onClear"></span>
 
-      
+
 
     </div>
     <div class='err-msg' v-if='errMsg'>{{errMsg}}</div>
 
     <button @click="toAsync">
          异步测试：{{asyncResult}}
-      </button> 
+      </button>
   </div>
 </template>
 
 <script>
 export default {
-  
+
   data(){
     return {
       errMsg:'',
@@ -468,7 +468,7 @@ export default {
     name: String
   },
   mounted(){
-    
+
   },
   computed:{
     inputType: function(){
@@ -520,7 +520,7 @@ export default {
       }else{
         this.$emit('Parblur', this.name, this.value)
       }
-      
+
     },
     onFocus(){
       this.errMsg = ''
