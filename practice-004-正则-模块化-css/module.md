@@ -158,11 +158,76 @@ math.add(1, 3)
 require传一个string时是同步加载，传数组的时候是异步加载。对于服务端，同步加载并不是问题，浏览器环境才是问题
 
 
-# (5 AMD/CMD
+# (5 AMD / CMD
 
 那我们针对浏览器环境，再来看看。这里有两个规范
 
 - AMD：RequireJS 针对浏览器模块化的规范输出
 - CMD：SeaJS 针对浏览器模块化的规范输出
 
-http://huangxuan.me/js-module-7day/#/43
+然而都会在外面包裹一层define()，所以...
+
+
+# (6 browserify / webpack
+我们现在就是想去掉这层包裹
+
+## browserify
+  浏览器环境里的commonJS，编写之后，自动watch compile，也是通过AST抽象语法树来分析依赖关系，debug则通过source map，
+
+## webpack
+  转换，绑定，打包里的所有文件。webapck更大更全，兼容性，代码分割，加载器，插件，开发工具，工作流。
+
+
+
+# (7 es6 module
+在es6之前，js没有模块可言。
+
+## babel
+现在就开始使用下一代的js特性，import引入，export导出
+
+```js
+// math.js
+export default math = {
+    PI: 3.14,
+    foo: function(){}
+}
+
+// app.js
+import math from "./math";
+math.PI
+```
+
+## 来看看几个说烂了的
+
+require是node和es6都支持的
+
+### 1）module.exports | exports
+这是node环境的模块规范，
+
+### 2）import | export | export default
+export default 相当于自动帮你包裹了导出，export 导出的，在引入的时候需要加上{}
+```js
+// export
+export const a = '100';
+export const dogSay = function(){
+  console.log('wang wang');
+}
+function catSay(){
+  console.log('miao miao');
+}
+export { catSay }
+
+// import
+import { dogSay, catSay } from './testEs6Export';
+
+
+// export default
+const m = 100;
+export default m;
+
+// import
+import m from './testEs6Export';
+
+//  as 集合成对象导出
+import * as testModule from './testEs6Export';
+```
