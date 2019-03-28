@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>lyx</title>
+    <body>
+      <div id="app">
+        <input id='input'/>
+        <p id='p'></p>
+      </div>
+    </body>
+    <script>
+
+
+      const Vue = (function() {
+
+        let uid = 0;
+
+
+        /**
+         * 订阅中心，Observer通知Dep更新Watcher
+         */
+        class Dep {
+          constructor() {
+            this.id = uid++;
+            this.subs = [];
+          }
+          depend() {
+            // 让Watcher收集Dep
+            Dep.target.addDep(this);
+          }
+          addSub(sub) {
+            // 添加Watcher
+            this.subs.push(sub);
+          }
+          notify() {
+            // 通知Watcher更新
+            this.subs.forEach(sub => sub.update());
+          }
+        }
+        // 为Dep类设置一个静态属性,默认为null,工作时指向当前的Watcher
+        Dep.target = null;
+
+
+
+
+        /**
+         * 监听者，Observer监听属性，变化了通知Deps
+         */
+        class Observer {
+          constructor(value) {
+            this.value = value;
+            this.walk(value);
+          }
+          // 遍历属性值并监听
+          walk(value) {
+            Object.keys(value).forEach(key => this.convert(key, value[key]));
+          }
+          // 执行监听的具体方法
+          convert(key, val) {
+            const dep = new Dep();
+            Object.defineProperty(this.value, key, {
+              enumerable: true,
+              configurable: true,
+              get: () => {
+                if (Dep.target) {
+                  dep.depend();
+                }
+                return val;
+              },
+              set: newVal => {
+                if (val === newVal) return;
+                val = newVal;
+                dep.notify();
+              },
+            });
+          }
+        }
+
+
+
+        /**
+         * 订阅者，接收Deps通知，并把自己添加到Deps中，一个watcher只监听一个key
+         */
+        class Watcher {
+          constructor(vm, key, cb) {
+            this.depIds = {};
+            this.vm = vm;
+            this.cb = cb;
+            this.key = key;
+            // 存储着上一次的值，
+            this.val = this.get();
+          }
+          update() {
+            // 暴露给外部，让订阅中心调用更新
+            this.run();
+          }
+          addDep(dep) {
+            // 保留给外部，给Watcher自己添加dep
+            if (!this.depIds.hasOwnProperty(dep.id)) {
+              dep.addSub(this);
+              this.depIds[dep.id] = dep;
+            }
+          }
+          run() {
+
+            // 获得就的值
+            const val = this.get();
+            if (val !== this.val) {
+              this.val = val;
+              // 然后在callback中，我们改变this.vm._data的值
+              this.cb.call(this.vm, val);
+            }
+          }
+          get() {
+            // this.vm._data已经在新建Vue的时候，被代理，访问的时候会触发get方法
+            // 此时这个watch就收集了deps
+            // deps在把这个watch收集起来
+            Dep.target = this;
+            const val = this.vm._data[this.key];
+            Dep.target = null;
+            return val;
+          }
+        }
+
+        class Vue {
+          constructor(options = {}) {
+            this.$options = options;
+            this._data = this.$options.data;
+            // 将所有data最外层属性代理到Vue实例上
+            Object.keys(this._data).forEach(key => this._proxy(key));
+            // 监听数据
+            new Observer(this._data);
+          }
+          // 对外暴露调用订阅者的接口，内部主要在指令中使用订阅者
+          $watch(key, cb) {
+            new Watcher(this, key, cb);
+          }
+          _proxy(key) {
+            // 在vue实例上定义了方法
+            Object.defineProperty(this, key, {
+              configurable: true,
+              enumerable: true,
+              get: () => this._data[key],
+              set: val => {
+                this._data[key] = val;
+              },
+            });
+          }
+        }
+
+        return Vue;
+
+      })();
+
+      let demo = new Vue({
+        data: {
+          text: '',
+        }
+      });
+      const p = document.getElementById('p');
+      const input = document.getElementById('input');
+
+      input.addEventListener('keyup', function(e) {
+        demo.text = e.target.value;
+      });
+
+      demo.$watch('text', str => p.innerHTML = str);
+
+    </script>
+  </head>
+
+</html>
+
+
