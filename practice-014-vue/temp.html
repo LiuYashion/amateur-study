@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>lyx</title>
+<body>
+  <ul>
+    <li><a href="#/">turn /</a></li>
+    <li><a href="#/one">turn one</a></li>
+    <li><a href="#/two">turn two</a></li>
+  </ul>
+  <button class="forward"  onclick="Router.forward()">前进</button>
+  <button class="backward" onclick="Router.backward()">后退</button>
+  <br/>
+  <br/>
+  <br/>
+  <div>
+    <div>
+      当前URL:&nbsp;&nbsp;&nbsp;<span id='info1'>11111</span>
+    </div>
+    <div>
+      历史记录:&nbsp;&nbsp;&nbsp;<span id='info2'>11111</span>
+    </div>
+    <div>
+      当前索引:&nbsp;&nbsp;&nbsp;<span id='info3'>11111</span>
+    </div>
+    <div>
+      当前状态:&nbsp;&nbsp;&nbsp;<span id='info4'>11111</span>
+    </div>
+  </div>
+  
+</body>
+<script>
+  class Routers {
+    constructor() {
+      this.state = ''
+      this.routes = {}
+      this.URL = ''
+      this.history = []
+      this.Index = this.history.length - 1
+      window.addEventListener('load', this.refresh.bind(this), false)
+      window.addEventListener('hashchange', this.refresh.bind(this), false)
+    }
+    getRoutersState() {
+      const info1 = document.querySelector('#info1')
+      info1.innerHTML = this.URL
+      const info2 = document.querySelector('#info2')
+      info2.innerHTML = JSON.stringify(this.history)
+      const info3 = document.querySelector('#info3')
+      info3.innerHTML = this.Index
+      const info4 = document.querySelector('#info4')
+      info4.innerHTML = this.state
+    }
+    route(path, cb) {
+      this.routes[path] = cb || function(){}
+    }
+    refresh() {
+      if (this.state === '') {
+        this.URL = location.hash.slice(1) || '/'
+        this.history.push(this.URL)
+        this.Index++
+        this.routes[this.URL]()
+      }
+      this.state = ''
+      this.getRoutersState()
+    }
+    forward() {
+      this.state = 'forward'
+      // 前进
+      this.Index >= this.history.length - 1
+        ? this.Index = this.history.length - 1
+        : this.Index = this.Index + 1
+
+      let hash = this.history[this.Index]
+      location.hash = `#${hash}`
+      this.routes[hash]()
+
+      this.getRoutersState()
+    }
+    backward() {
+      this.state = 'backward'
+      // 后退
+      this.Index <= 0 
+        ? this.Index = 0
+        : this.Index = this.Index - 1
+
+      let hash = this.history[this.Index]
+      location.hash = `#${hash}`
+      this.routes[hash]()
+
+      this.getRoutersState()
+    }
+  }
+
+
+  const Router = new Routers();
+  window.Router = Router;
+  const content = document.querySelector('body');
+  const button = document.querySelector('button');
+  function changeBgColor(color) {
+    content.style.backgroundColor = color;
+  }
+
+  Router.route('/', function() {
+    changeBgColor('yellow');
+  });
+  Router.route('/one', function() {
+    changeBgColor('blue');
+  });
+  Router.route('/two', function() {
+    changeBgColor('green');
+  });
+
+
+  // 以上是history的方案，现在看看HTML5的解决方案
+  // 当history对象变化的时候，会触发popstate事件
+  history.back();       // 后退
+  history.forward();    // 前进
+  history.go(-3);       // 后退三个页面
+  history.pushState({state: 0, title: 'xxx', url: 'xxxx'})      // 用于添加历史记录
+  history.replaceState({state: 0, title: 'xxx', url: 'xxxx'})   // 用于修改当前历史记录
+  
+
+  class Routers {
+    constructor() {
+      this.routes = {};
+      // 在初始化时监听popstate事件
+      this._bindPopState();
+    }
+    // 初始化路由
+    init(path) {
+      history.replaceState({path: path}, null, path);
+      this.routes[path] && this.routes[path]();
+    }
+    // 将路径和对应回调函数加入hashMap储存
+    route(path, callback) {
+      this.routes[path] = callback || function() {};
+    }
+
+    // 触发路由对应回调
+    go(path) {
+      history.pushState({path: path}, null, path);
+      this.routes[path] && this.routes[path]();
+    }
+    // 监听popstate事件
+    _bindPopState() {
+      window.addEventListener('popstate', e => {
+        const path = e.state && e.state.path;
+        this.routes[path] && this.routes[path]();
+      });
+    }
+  }
+</script>
+</head>
+</html>
+
+
