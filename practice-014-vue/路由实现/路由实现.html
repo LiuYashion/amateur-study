@@ -4,33 +4,16 @@
 <meta charset="utf-8">
 <title>lyx</title>
 <body>
-  <ul>
-    <li><a href="#/">turn /</a></li>
-    <li><a href="#/one">turn one</a></li>
-    <li><a href="#/two">turn two</a></li>
-  </ul>
-  <button class="forward"  onclick="Router.forward()">前进</button>
-  <button class="backward" onclick="Router.backward()">后退</button>
-  <br/>
-  <br/>
-  <br/>
-  <div>
-    <div>
-      当前URL:&nbsp;&nbsp;&nbsp;<span id='info1'>11111</span>
-    </div>
-    <div>
-      历史记录:&nbsp;&nbsp;&nbsp;<span id='info2'>11111</span>
-    </div>
-    <div>
-      当前索引:&nbsp;&nbsp;&nbsp;<span id='info3'>11111</span>
-    </div>
-    <div>
-      当前状态:&nbsp;&nbsp;&nbsp;<span id='info4'>11111</span>
-    </div>
+  <div id="app">
+    <ul>
+        <li><a href="#/">turn yellow</a></li>
+        <li><a href="#/blue">turn blue</a></li>
+        <li><a href="#/green">turn green</a></li>
+    </ul>
   </div>
-  
 </body>
 <script>
+
   class Routers {
     constructor() {
       this.state = ''
@@ -80,7 +63,7 @@
     backward() {
       this.state = 'backward'
       // 后退
-      this.Index <= 0 
+      this.Index <= 0
         ? this.Index = 0
         : this.Index = this.Index - 1
 
@@ -119,7 +102,7 @@
   history.go(-3);       // 后退三个页面
   history.pushState({state: 0, title: 'xxx', url: 'xxxx'})      // 用于添加历史记录
   history.replaceState({state: 0, title: 'xxx', url: 'xxxx'})   // 用于修改当前历史记录
-  
+
 
   class Routers {
     constructor() {
@@ -150,6 +133,7 @@
       });
     }
   }
+
 </script>
 </head>
 </html>
