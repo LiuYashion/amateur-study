@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>lyx</title>
+<body>
+  <div id="app">
+    <input id='input'/>
+    <p id='p'></p>
+  </div>
+</body>
+<script>
+
+var trees = {"name":"Levl-1","child":[{"name":"Levl-1-1","child":null},{"name":"Levl-1-2","child":[{"name":"Levl-1-2-1","child":[{"name":"Levl-1- 2-1-1","child":null}]},{"name":"Levl-1-2-2","child":null}]},{"name":"Levl-1-3","child":null}]}
+
+var activeIns = null;
+class Vue {
+  constructor(tree) {
+    this.tree = tree
+  }
+  __update__(tree){
+    const preActiveIns = activeIns
+    activeIns = tree
+
+    if(tree.child != null) {
+      tree.child.forEach( tree => {
+        this.__patch__(tree)
+      })
+    }
+    activeIns = preActiveIns
+  }
+  __patch__(tree){
+    console.log(`${tree.name} 更新，父节点: ${activeIns.name}`)
+
+    if (tree.child != null) {
+      tree.child.forEach( tree => {
+        this.__update__(tree)
+      })
+    }
+  }
+}
+
+let foo = new Vue()
+foo.__update__(trees)
+foo.__update__(trees)
+
+
+</script>
+</head>
+</html>
+
+
