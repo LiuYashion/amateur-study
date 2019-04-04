@@ -1,0 +1,150 @@
+# 响应式
+Vue是 数据 驱动了DOM的 渲染
+
+### 响应式对象
+Object.defineProperty给数据添加了setter和getter，从而设置代理
+
+### 依赖收集
+getter就是做依赖收集的
+
+会有一个全局变量（Dep.target），用来保存当前激活的Watcher。每个数据都持有一个dep，dep里面有一个subs专门用来保存watcher
+
+
+## getter
+```js
+/** getter */
+function defineReactive (obj, key, val) {
+  /* 新建 dep */
+  const dep = new Dep()
+  Object.defineProperty(obj, key, {
+    enumerable: true,
+    configurable: true,
+    get: function reactiveGetter () {
+      if (Dep.target) {
+        /** 收集当前激活的 watcher */
+        dep.depend()
+      }
+      return value
+    },
+  })
+}
+
+```
+
+## dep
+```js
+/** Dep */
+export default class Dep {
+  static target; subs;
+  constructor () {
+    this.subs = []
+  }
+  addSub (sub: Watcher) {
+    this.subs.push(sub)
+  }
+  removeSub (sub: Watcher) {
+    remove(this.subs, sub)
+  }
+  depend () {
+    /**
+     * Dep.target已经被赋值，
+     * 调用depend会往当前激活的watcher，
+     * 传入this(dep)，然后让watcher把自己压入到这个dep的subs里面，
+     * 这样，拥有这个dep的data，就知道有哪些watcher依赖自己，
+     * 就能够通知了
+     */
+    if (Dep.target) {
+      Dep.target.addDep(this)
+    }
+  }
+  notify () {
+    const subs = this.subs.slice()
+    for (let i = 0, l = subs.length; i < l; i++) {
+      subs[i].update()
+    }
+  }
+}
+
+Dep.target = null
+const targetStack = []
+
+/**
+ * 每个data会持有一个dep，当新建watcher的时候
+ * Dep.target用来保存当前的watcher
+ * 就会调用pushTarget，即让当前watcher入栈
+ */
+export function pushTarget (_target) {
+  if (Dep.target) targetStack.push(Dep.target)
+  Dep.target = _target
+}
+
+export function popTarget () {
+  Dep.target = targetStack.pop()
+}
+```
+
+
+
+## watcher
+
+```js
+export default class Watcher {
+  deps;
+  newDeps;
+  depIds;
+  newDepIds;
+  constructor() {
+
+  }
+  get() {
+    return value
+  }
+  addDep (dep) {
+    const id = dep.id
+    if (!this.newDepIds.has(id)) {
+      this.newDepIds.add(id)
+      this.newDeps.push(dep)
+      if (!this.depIds.has(id)) {
+        dep.addSub(this)
+      }
+    }
+  }
+  cleanupDeps () {
+
+  }
+}
+```
+
+
+## begin
+
+```js
+// 2.执行updateComponent方法
+updateComponent = () => {
+  // 3.调用render的时候，会访问vm，触发getter
+  vm._update(vm._render(), hydrating)
+}
+// 1.新建watcher的时候，就调用上面的pushTarget方法
+// 完成Dep.target赋值
+// watcher是用来更新dom的
+new Watcher(vm, updateComponent, noop, {
+  before () {
+    if (vm._isMounted) {
+      callHook(vm, 'beforeUpdate')
+    }
+  }
+}, true /* isRenderWatcher */)
+```
+
+这样，进过依赖手机，我们就把data和watcher绑定了起来
+
+```js
+// 针对每个data，都会做一次
+data {
+  getter: {
+    Dep: {
+      subs: [watcher1, watcher2, watcher3]
+    }
+  }
+}
+```
