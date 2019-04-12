@@ -35,7 +35,7 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
 }
 ```
 
-我们再来看patch方法
+我们再来看patch方法，如果是相同的调用patchVnode（见下面）
 ```js
 return function patch (oldVnode, vnode, hydrating, removeOnly) {
 
@@ -89,3 +89,8 @@ return function patch (oldVnode, vnode, hydrating, removeOnly) {
   return vnode.elm
 }
 ```
+
+
+看看patchVnode（当新旧节点相同的时候），其实就是把新的node patch到旧的vnode上，
+
+
