@@ -18,7 +18,7 @@ new Watcher(vm, updateComponent, noop, {
 }, true /* isRenderWatcher */)
 ```
 
-来看看_update方法，其实最后也是调用vm.__patch__方法（我们之前已经分析过了）
+来看看_update方法，其实最后也是调用vm.__patch__方法（我们之前已经分析过了），然后更新dom
 ```js
 Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
   const vm: Component = this
@@ -35,62 +35,24 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
 }
 ```
 
-我们再来看patch方法，如果是相同的调用patchVnode（见下面）
+
+## diff
+组件更新的过程，就是（新vnode 和 旧dom）的过程，比较只会选择同一层级的dom做比较
+
 ```js
-return function patch (oldVnode, vnode, hydrating, removeOnly) {
-
-  /** 判断新旧node是否相同 */
-  if (sameVnode(oldVnode, vnode)) {
-    // （如果新旧节点相同）
-    patchVnode(oldVnode, vnode, insertedVnodeQueue, removeOnly)
-  } else {
-    // （如果新旧节点不同）
-    const oldElm = oldVnode.elm
-    const parentElm = nodeOps.parentNode(oldElm)
-    // 创建新节点
-    createElm(
-      vnode,
-      insertedVnodeQueue,
-      oldElm._leaveCb ? null : parentElm,
-      nodeOps.nextSibling(oldElm)
-    )
-
-    // 找到当前 vnode 的父的占位符节点
-    // 然后更新节点
-    if (isDef(vnode.parent)) {
-      let ancestor = vnode.parent
-      const patchable = isPatchable(vnode)
-      while (ancestor) {
-        // 先执行各个 module 的 destroy 的钩子函数
-        for (let i = 0; i < cbs.destroy.length; ++i) {
-          cbs.destroy[i](ancestor)
-        }
-        ancestor.elm = vnode.elm
-        // 如果当前占位符是一个可挂载的节点
-        if (patchable) {
-          for (let i = 0; i < cbs.create.length; ++i) {
-            cbs.create[i](emptyNode, ancestor)
-          }
-        }
-        ancestor = ancestor.parent
-      }
-    }
-
-    // 把 oldVnode 从当前 DOM 树中删除，
-    // 逻辑就是遍历待删除的 vnodes 做删除
-    if (isDef(parentElm)) {
-      removeVnodes(parentElm, [oldVnode], 0, 0)
-    } else if (isDef(oldVnode.tag)) {
-      invokeDestroyHook(oldVnode)
-    }
-  }
-
-  invokeInsertHook(vnode, insertedVnodeQueue, isInitialPatch)
-  return vnode.elm
+oldVnode (old dom) {
+  [ A, B, C, D ]
+    ↑        ↑
+  oStart   oEnd
+}
+Vnode (new vnode) {
+  [ D, C, B, A, E ]
+    ↑           ↑
+  start        end
 }
 ```
 
-
-看看patchVnode（当新旧节点相同的时候），其实就是把新的node patch到旧的vnode上，
-
-
+- （oStart，end）匹配上了，oldS会移到最后
+- （oEnd，start）匹配上了，oEnd会移到最前
+- （oEnd，end）匹配上了，oEnd会移到最前
+- （oStart，start）匹配上了，oEnd会移到最前
