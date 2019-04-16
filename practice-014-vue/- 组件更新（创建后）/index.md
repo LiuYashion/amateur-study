@@ -41,18 +41,71 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
 
 ```js
 oldVnode (old dom) {
-  [ A, B, C, D ]
-    ↑        ↑
-  oStart   oEnd
+  [ A, B, D ]
+    ↑     ↑
+    oS    oE
 }
 Vnode (new vnode) {
-  [ D, C, B, A, E ]
-    ↑           ↑
-  start        end
+  [ A, C, D, B]
+    ↑        ↑
+    s        e
 }
 ```
 
-- （oStart，end）匹配上了，oldS会移到最后
-- （oEnd，start）匹配上了，oEnd会移到最前
-- （oEnd，end）匹配上了，oEnd会移到最前
-- （oStart，start）匹配上了，oEnd会移到最前
+这里有4个节点（oS oE s e）互相比较
+> 当其中有两个能匹配上，那么真实dom节点会移动到vnode的位置
+
+1. (oS，s)匹配上了，oS就在第一个就不管了。oS++，s++；
+```js
+[ A, B, D ]
+  ↑     ↑
+  oS    oE
+
+[ A, C, D, B]
+  ↑        ↑
+  s        e
+```
+
+2. (oS，e)匹配上了，就把oS移到最后的位置。oS++，e--；
+```js
+[ A, B, D ]
+     ↑  ↑
+     oS oE
+
+[ A, C, D, B]
+     ↑     ↑
+     s     e
+```
+
+3. (oE，e)匹配上了，位置不变，都是倒数第二，oE--，e--；
+```js
+[ A, D, B]
+     ↑
+     oS,oE
+
+[ A, C, D, B]
+     ↑  ↑
+     s  e
+```
+
+oS和oE先重叠，oldChildren先遍历完。将对于的vnode插进去即可。如果是children先遍历完，将真实dom中，区间为[oS, oE]的删掉即可
+
+
+### 换个demo
+```js
+[ -A, B, C, -D ]
+[ -D, C, B, A, -E ]
+
+// oE，s相同
+[ D, -A, B, -C ]
+[ D, -C, B, A, -E ]
+
+[ A, B, C, D ]
+[ D, C, B, A, E ]
+
+[ A, B, C, D ]
+[ D, C, B, A, E ]
+
+[ A, B, C, D ]
+[ D, C, B, A, E ]
+```
