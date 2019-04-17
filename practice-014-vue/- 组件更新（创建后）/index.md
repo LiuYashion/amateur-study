@@ -39,6 +39,13 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
 ## diff
 组件更新的过程，就是（新vnode 和 旧dom）的过程，比较只会选择同一层级的dom做比较
 
+经过阅读源码，我们看看比较的逻辑顺序：
+
+  1. (oS, s)相同就都++
+  2. (oE, e)相同就都--
+  3. (oS, e)相同就oS会移动到最后，oS++ e--
+  4. (oE, s)相同就oE会移动到最前，oE-- s++
+
 ```js
 oldVnode (old dom) {
   [ A, B, D ]
@@ -46,7 +53,7 @@ oldVnode (old dom) {
     oS    oE
 }
 Vnode (new vnode) {
-  [ A, C, D, B]
+  [ A, C, D, B ]
     ↑        ↑
     s        e
 }
@@ -90,22 +97,28 @@ Vnode (new vnode) {
 
 oS和oE先重叠，oldChildren先遍历完。将对于的vnode插进去即可。如果是children先遍历完，将真实dom中，区间为[oS, oE]的删掉即可
 
+> oldChildren 先遍历完，说明有新的vnode需要插入
+> vnode 先遍历完，说明有旧dom需要删除
 
-### 换个demo
+### demo1
 ```js
 [ -A, B, C, -D ]
 [ -D, C, B, A, -E ]
+// oE，s匹配。oE移到首位，oE--，s++
 
-// oE，s相同
 [ D, -A, B, -C ]
 [ D, -C, B, A, -E ]
+// oE，s匹配。oE移到首位，oE--，s++
 
-[ A, B, C, D ]
-[ D, C, B, A, E ]
+[ D, C, -A, -B ]
+[ D, C, -B, A, -E ]
+// oE，s匹配。oE移到首位，oE--，s++
 
-[ A, B, C, D ]
-[ D, C, B, A, E ]
+[ D, C, B, --A ]
+[ D, C, B, -A, -E ]
+// 此时oS === s，oS++，s++。然后oldChildren先遍历完
 
-[ A, B, C, D ]
-[ D, C, B, A, E ]
+[ D, C, B, -A (-)]
+[ D, C, B, A, --E ]
+// oE < oS，将[s, e]区间插入即可
 ```
