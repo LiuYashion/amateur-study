@@ -36,7 +36,7 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
 ```
 
 
-## diff
+## diff（所有的指针只针对位置，不针对元素）
 组件更新的过程，就是（新vnode 和 旧dom）的过程，比较只会选择同一层级的dom做比较
 
 经过阅读源码，我们看看比较的逻辑顺序：
@@ -45,6 +45,13 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
   2. (oE, e)相同就都--
   3. (oS, e)相同就oS会移动到最后，oS++ e--
   4. (oE, s)相同就oE会移动到最前，oE-- s++
+
+如果都没有匹配上：
+
+#### 当有key的时候
+
+根据oldChild的key生成一张hash表，用s的key与之比较，s和oS比较，相同就把oS指向的移到最前面
+
 
 ```js
 oldVnode (old dom) {
@@ -102,6 +109,7 @@ oS和oE先重叠，oldChildren先遍历完。将对于的vnode插进去即可。
 
 ### demo1
 ```js
+/** 新增了节点的 */
 [ -A, B, C, -D ]
 [ -D, C, B, A, -E ]
 // oE，s匹配。oE移到首位，oE--，s++
@@ -121,4 +129,46 @@ oS和oE先重叠，oldChildren先遍历完。将对于的vnode插进去即可。
 [ D, C, B, -A (-)]
 [ D, C, B, A, --E ]
 // oE < oS，将[s, e]区间插入即可
+```
+
+
+### demo2
+```js
+/** 删除了节点的 */
+[ +A, C, E, B, -D ]
+[ +C, B, -A ]
+
+[ +C, E, B, -D, A ]
+[ +C, -B, A ]
+
+[ C, +E, B, -D, A ]
+[ C, +-B, A ]
+// 都没有匹配的，创建一个hash表，找到了B
+
+[ C, B, +E, -D, A ]
+[ C, -B, +A ]
+// chilren想比较完，删掉[E, D]
+
+[ C, B, A ]
+[ C, -B, +A ]
+```
+
+
+
+### demo3
+```js
+/** 全部是新的 */
+[ +A, B, C, -D ]
+[ +E, F, G, -H ]
+
+[ E, +A, B, C, -D ]
+[ E, +F, G, -H ]
+
+...
+[ E, F, G, H ,+A, B, C, -D ]
+[ E, F, G, +-H ]
+// children先比较完 删掉[A, B, C, D]
+
+[ E, F, G, H ,+A, B, C, -D ]
+[ E, F, G, +-H ]
 ```
