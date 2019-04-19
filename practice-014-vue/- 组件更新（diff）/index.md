@@ -143,14 +143,14 @@ oS和oE先重叠，oldChildren先遍历完。将对于的vnode插进去即可。
 
 [ C, +E, B, -D, A ]
 [ C, +-B, A ]
-// 都没有匹配的，创建一个hash表，找到了B
+// 都没匹配上，生成hash表。用oS和s判断，于是找到了b
 
 [ C, B, +E, -D, A ]
 [ C, -B, +A ]
-// chilren想比较完，删掉[E, D]
+// // chilren先比较完，删掉[E, D]
 
 [ C, B, A ]
-[ C, -B, +A ]
+[ C, B, A ]
 ```
 
 
@@ -169,6 +169,31 @@ oS和oE先重叠，oldChildren先遍历完。将对于的vnode插进去即可。
 [ E, F, G, +-H ]
 // children先比较完 删掉[A, B, C, D]
 
-[ E, F, G, H ,+A, B, C, -D ]
-[ E, F, G, +-H ]
+[ E, F, G, H ]
+[ E, F, G, H ]
+```
+
+
+### demo4
+```js
+/** 新增了，也删除了 */
+[+A, B, C, D, -E]
+[+D, C, B, F, -G]
+// 都没匹配上，生成hash，s与[oS, .. oE]比较
+
+[D, +A, B, C, -E]
+[D, +C, B, F, -G]
+
+[D, C, +A, B, C, -E]
+[D, C, +B, F, -G]
+
+[D, C, B, +A, C, -E]
+[D, C, B, +F, -G]
+
+[D, C, B, F, +A, C, -E]
+[D, C, B, F, +-G]
+
+[D, C, B, F, G, +A, C, -E]
+[D, C, B, F, -G (+)]
+// children先比较完，所以删除[A,C,E]
 ```
