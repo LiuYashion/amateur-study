@@ -213,6 +213,12 @@ replace的第二个参数还有一些用法
 'aa11AA'.replace(/([a-z]+)(\d+)([A-Z]+)/g, '$2'); // "11"
 'aa11AA'.replace(/([a-z]+)(\d+)([A-Z]+)/g, '$3'); // "AA"
 'aa11AA'.replace(/([a-z]+)(\d+)([A-Z]+)/g, '$4'); // "$4"
+
+'aa11AA'.replace(/([a-z]+)(\d+)([A-Z]+)/g, function($1, $2, $3){
+  console.log($1, $2, $3)
+});
+
+
 ```
 
 **\$`, \$', \$$**
@@ -254,9 +260,19 @@ replace的第二个参数还有一些用法
 【百度】376687（动态验证码），请在30分钟内填写。
 
 ```js
+// 把非数字的标记出来
+var reg = /((?:验证码\D*)(\d{6}|\d{4}))|((\d{6}|\d{4})(?:\D*验证码))/;
+var str = '【百度】376687（动态验证码），请在30分钟内填写。'
 
-function getVerifycode(str) {
-  var reg = /((?:验证码\D*)(\d{4}|\d{6}))|((\d{4}|\d{6})(?:\D*验证码))/
-
+function getVerifyCode(str) {
+  return new Promise((resolve, reject) => {
+    str.replace(/(\d{6}|\d{4})(?:\D*验证码)/, (all, $1)=>{
+      resolve($1)
+    })
+  })
 }
+
+getVerifyCode(str).then(res=>{
+  console.log(res)
+})
 ```

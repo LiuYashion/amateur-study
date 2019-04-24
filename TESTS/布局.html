@@ -1,0 +1,84 @@
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+<style>
+html,body{
+  background: #333;
+  margin: 0;
+  padding: 0;
+}
+.father{
+  background: #b6cfff5c;
+  border-radius: 8px;
+  width: 300px;
+  height: 300px;
+  margin: 10px;
+}
+
+.father-flex{
+  display: flex;
+  flex-direction: row;
+  /* 主轴的方向（这里主轴是水平） */
+  flex-wrap: wrap;
+  /* 是否换行 */
+  justify-content: flex-end;
+  /* 主轴(水平)上的排列 */
+  align-items: center;
+  /* 交叉轴(垂直)上的排列 */
+  align-content: space-around;
+  /* 多根主轴(水平)的对齐方式 */
+}
+.father-flex div{
+  background: lightcyan;
+  width: 40px;
+  height: 40px;
+  margin: 10px;
+  border-radius: 4px;
+}
+
+
+.father-grid{
+  display: grid;
+}
+.father-grid div{
+  background: lightcoral;
+  /* width: 30px;
+  height: 30px; */
+  margin: 10px;
+  border-radius: 4px;
+}
+#item-3{
+  grid-row-start: 0;
+  grid-column-start: 0;
+  grid-row-end: 3;
+  grid-column-end: 3;
+  background: lightgreen;
+}
+
+</style>
+<body>
+  <div class="father father-flex">
+    <div>1</div>
+    <div>2</div>
+    <div class="item-3">3</div>
+    <div>4</div>
+    <div>5</div>
+    <div>6</div>
+    <div class="item-7">7</div>
+    <div>8</div>
+  </div>
+
+  <div class="father father-grid">
+    <div>1</div>
+    <div>2</div>
+    <div id="item-3">3</div>
+    <div>4</div>
+    <div>5</div>
+    <div>6</div>
+    <div class="item-7">7</div>
+    <div>8</div>
+  </div>
+
+
+</body>
+</head>
