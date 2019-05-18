@@ -1,0 +1,39 @@
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+</head>
+<style>
+
+</style>
+<body>
+    <div>
+        navigator <button id='button'>导航</button>
+    </div>
+    <div>
+        ----------------------
+    </div>
+    <div id='article'>
+        article
+    </div>
+    <div id='bottom'>
+        bottom bar
+    </div>
+</body>
+<script>
+
+
+document.getElementById('article').addEventListener('navButtonClick', ()=>{
+    console.log(3333)
+})
+document.getElementById('bottom').addEventListener('navButtonClick', ()=>{
+    console.log(4444)
+})
+
+
+
+var event1 = document.createEvent('HTMLEvents');
+event1.initEvent('navButtonClick', false/** 是否冒泡 */, false/** 是否取消默认动作 */);
+
+document.dispatchEvent(event1);
+
+</script>

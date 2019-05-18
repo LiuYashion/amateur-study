@@ -1,0 +1,67 @@
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+</head>
+<style>
+.c3{
+  width: 300px;
+  height: 300px;
+  background: lightcoral
+}
+.c2{
+  width: 200px;
+  height: 200px;
+  background: orange
+}
+.c1{
+  width: 100px;
+  height: 100px;
+  background: lightblue
+}
+</style>
+<body>
+  <div id='3' class="c3">
+      3
+      <div id='2' class="c2">
+          2
+          <div id='1' class="c1">
+              1
+          </div>
+      </div>
+  </div>
+</body>
+<script>
+
+// 设置为true，在【捕获】阶段触发
+document.getElementById('1').addEventListener('click', function(e){
+    console.log(`蓝色 捕获`)
+    // e.stopPropagation()
+    // e.stopImmediatePropagation();
+}, true)
+document.getElementById('2').addEventListener('click', function(e){
+    console.log(`   黄色 捕获`)
+    // e.stopPropagation()
+}, true)
+document.getElementById('3').addEventListener('click', function(e){
+    console.log(`     红色 捕获`)
+    // e.stopPropagation()
+}, true)
+
+// 设置为false，在【冒泡】阶段触发
+document.getElementById('3').addEventListener('click', function(e){
+    console.log(`     红色 冒泡`)
+    // e.stopPropagation()
+}, false)
+document.getElementById('2').addEventListener('click', function(e){
+    console.log(`   黄色 冒泡`)
+    // e.stopPropagation()
+}, false)
+document.getElementById('1').addEventListener('click', function(e){
+    console.log(`蓝色 冒泡`)
+    // e.stopPropagation()
+    // e.stopImmediatePropagation();
+}, false)
+
+
+
+</script>

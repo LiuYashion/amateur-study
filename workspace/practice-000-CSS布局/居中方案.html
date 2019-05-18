@@ -1,0 +1,121 @@
+<head>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<style>
+body{
+  background: #333;
+}
+.ct1{
+  text-align: center;
+  margin: 0 auto;
+}
+
+.container{
+  height: 100px;
+  background: #666;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  color: #fff;
+  position: relative;
+}
+
+.span-y-mid{
+  height: 100px;
+  line-height: 100px;
+}
+.div-y-mid{
+  position: absolute;
+  transform: translateY(50%);
+  bottom: 50%;
+}
+.div-y-mid-2{
+  width: 80px;
+  height: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background: lightcoral;
+}
+
+.ct5{
+  display: table;
+  width: 100%;
+}
+.div-y-mid-3{
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.ct6{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ct7{
+  display: grid;
+  justify-content: center;
+  align-content: center;
+}
+
+
+
+</style>
+<body>
+
+  <div class="container ct1">
+    <span>sapn 水平居中 text-align: center</span>
+    <div>div 水平居中 margin: 0 auto</div>
+  </div>
+
+  <div class="container ct2">
+    <span class="span-y-mid">height</span>
+  </div>
+
+  <div class="container ct3">
+    <div class="div-y-mid">height</div>
+  </div>
+
+  <div class="container ct4">
+    <div class="div-y-mid-2">height</div>
+  </div>
+
+  <div class="container ct5">
+    <div class="div-y-mid-3">height</div>
+  </div>
+
+  <div class="container ct6">
+    <div>height</div>
+  </div>
+  
+  <div class="container ct7">
+    <div>height</div>
+  </div>
+
+  <div class="container ct8">
+    <div class="div-y-mid-4">height</div>
+  </div>
+
+</body>
+
+/** 所以我们总结一下居中 */
+
+1.  position: absolute
+    transform
+
+2.  position: absolute
+    marign: auto
+
+3.  display: flex
+    align-item: center
+    justify-content: center
+
+2.  display: grid
+    align-content: center
+    justify-conten: center
+

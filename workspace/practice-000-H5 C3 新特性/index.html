@@ -1,0 +1,29 @@
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+<style>
+
+@keyframes slidein {
+  from { transform: translate(0); }
+  to { transform: translate(200px); }
+}
+
+.animation{
+  animation: slidein 3s linear 1s infinite running;
+}
+
+.transition{
+  background: lightblue;
+  height: 30px;
+  transition: height 0.8s ease 0s;
+}
+.transition:hover{
+  height: 100px;
+}
+
+</style>
+<body>
+  <div class="animation"> style ~ </div>
+  <div class="transition"> style ~ </div>
+</body>
+</head>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>lyx</title>
+<body>
+  <div id="app">
+    <input id='input'/>
+    <p id='p'></p>
+  </div>
+</body>
+<script>
+  
+const isType = function(obj, type){
+
+  if (typeof obj !== 'object') return false;
+  const typeString = Object.prototype.toString.call(obj);
+  let flag;
+  switch (type) {
+    case 'Array':
+      flag = typeString === '[object Array]';
+      break;
+    case 'Date':
+      flag = typeString === '[object Date]';
+      break;
+    case 'RegExp':
+      flag = typeString === '[object RegExp]';
+      break;
+    default:
+      flag = false;
+  }
+  return flag;
+}
+
+
+const deepClone = parent => {
+
+  const _clone = origin => {
+
+    if (origin === null) return null;
+    if (typeof origin !== 'object') return origin
+
+    let copy = {};
+
+
+    if (isType(origin, 'Array')) {
+      // 如果是数组
+      copy = Array.from(origin)
+    } else if (isType(origin, 'RegExp')) {
+      // 如果是正则
+      let flags = ''
+      if (origin.global) flags += 'g';
+      if (origin.ignoreCase) flags += 'i';
+      if (origin.multiline) flags += 'm';
+      copy = new RegExp(origin.source, flags);
+
+    } else if (isType(origin, 'Date')) {
+      // 如果是日期
+      copy = new Date(origin.getTime())
+
+    } else {
+
+    }
+
+    for (let key in origin) {
+      copy[key] = _clone(origin[key])
+    }
+
+    return copy
+  };
+  return _clone(parent)
+}
+
+function person(pname) {
+  this.name = pname;
+}
+
+const Messi = new person('Messi');
+
+function say() {
+  console.log('hi');
+}
+
+const oldObj = {
+  a: say,
+  c: new RegExp('ab+c', 'i'),
+  d: Messi,
+  e: {
+    name: 'lyx'
+  }
+};
+
+const newObj = deepClone(oldObj);
+console.log(newObj)
+
+oldObj.e = '?????'
+console.log(newObj)
+
+</script>
+</head>
+</html>
+
+

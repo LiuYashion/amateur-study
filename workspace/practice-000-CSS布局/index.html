@@ -1,0 +1,72 @@
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+<style>
+  *{margin: 0;padding: 0;}
+  body{
+    margin: 0;
+    padding: 0;
+    background: #333;
+  }
+  .container{
+    width: 800px;
+    height: 600px;
+    background: ghostwhite;
+    margin: 0 auto;
+    margin-top: 200px;
+  }
+  .children{
+    background: lightgray;
+    border: solid 1px #666;
+  }
+
+
+  /** flex 布局 */
+  /* .display{
+    display: flex;
+    flex-wrap: wrap; 
+  }
+  .child{
+    width: calc((100% - 4px) / 2)
+  } */
+
+  /** grid 布局 */
+  /* .display{
+    display: grid;
+    grid-template-columns: repeat(3, 33.33%);
+  }
+  .child{
+    width: 100px;
+    height: 100px;
+  } */
+
+  /* .display{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .child{
+    width: 100px;
+    height: 100px;
+  } */
+
+  .display{
+    display: grid;
+    align-content: center;
+    justify-content: center;
+  }
+  .child{
+    width: 100px;
+    height: 100px;
+  }
+
+</style>
+<body>
+  <div class='container display'>
+    <div class='children child'>children 1</div>
+    <!-- <div class='children child'>children 2</div>
+    <div class='children child'>children 3</div>
+    <div class='children child'>children 4</div> -->
+  </div>
+</body>
+</head>
